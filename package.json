@@ -1,0 +1,28 @@
+{
+  "name": "mycar",
+  "version": "1.0.1",
+  "private": true,
+  "description": "MyCar — עד הטיפה האחרונה. מחשבון עלות נסיעה, יומן נסיעות ותדלוקים, עובד גם בלי אינטרנט",
+  "scripts": {
+    "prepare-web": "node scripts/prepare-web.mjs",
+    "fetch-data": "node scripts/fetch-data.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/geolocation": "^7.0.0",
+    "@capacitor/haptics": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/network": "^7.0.0",
+    "@capacitor/preferences": "^7.0.0",
+    "@capacitor/share": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "esbuild": "^0.25.0",
+    "pdfjs-dist": "^4.10.38"
+  }
+}

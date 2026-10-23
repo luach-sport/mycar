@@ -1,0 +1,37 @@
+name: Update offline data
+
+# Monthly: new regulated fuel price (published at the end of each month) and, when stale, road distances.
+# Installed apps download the updated files from the repo automatically when they are online.
+on:
+  schedule:
+    - cron: '17 6 1,2,3,16 * *'
+  workflow_dispatch:
+    inputs:
+      force_roads:
+        description: 'Recompute road distances now'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install packages
+        run: npm install --no-audit --no-fund pdfjs-dist@4
+      - name: Refresh data
+        run: |
+          if [ "${{ inputs.force_roads }}" = "true" ]; then node scripts/fetch-data.mjs --force-roads --fuel; else node scripts/fetch-data.mjs; fi
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add www/data
+          if git diff --cached --quiet; then echo "nothing new"; else git commit -m "עדכון נתונים לשימוש בלי אינטרנט" && git push; fi

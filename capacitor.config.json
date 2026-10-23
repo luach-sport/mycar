@@ -1,0 +1,21 @@
+{
+  "appId": "com.luachsport.mycar",
+  "appName": "MyCar",
+  "webDir": "www",
+  "backgroundColor": "#F3F6FC",
+  "android": {
+    "backgroundColor": "#F3F6FC",
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_mycar",
+      "iconColor": "#1652F0"
+    },
+    "StatusBar": {
+      "backgroundColor": "#F3F6FC",
+      "style": "LIGHT",
+      "overlaysWebView": false
+    }
+  }
+}
