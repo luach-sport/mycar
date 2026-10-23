@@ -149,14 +149,14 @@ jobs:
       - name: Point the repo at the new update (backup source for the app)
         if: steps.key.outputs.signed == 'true'
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           [ -f dist/update.json ] || exit 0
-          cp dist/update.json update.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add update.json
-          git commit -q -m "גרסה זמינה לעדכון: ${APP_VERSION} (בנייה ${GITHUB_RUN_NUMBER})"
-          git pull -q --rebase origin main && git push -q || echo "::warning::could not push update.json"
+          SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/update.json?ref=main" -q .sha 2>/dev/null || true)
+          ARGS=(-X PUT "repos/${GITHUB_REPOSITORY}/contents/update.json" -f message="גרסה זמינה לעדכון: ${APP_VERSION} (בנייה ${GITHUB_RUN_NUMBER})" -f content="$(base64 -w0 dist/update.json)" -f branch=main)
+          if [ -n "$SHA" ]; then ARGS+=(-f sha="$SHA"); fi
+          gh api "${ARGS[@]}" -q '.commit.sha' || echo "::warning::could not publish update.json in the repo"
 
       - name: Keep the test APK
         if: steps.key.outputs.signed != 'true'
