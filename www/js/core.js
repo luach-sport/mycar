@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const MC = (window.MC = window.MC || {});
-  const VER = window.MYCAR_VERSION || { version: '1.01', build: 'dev' };
+  const VER = window.MYCAR_VERSION || { version: '1.02', build: 'dev' };
   MC.VERSION = VER;
   MC.REPO = 'luach-sport/mycar';
   MC.PAGES_URL = 'https://luach-sport.github.io/mycar/';
@@ -10,7 +10,8 @@
     'https://raw.githubusercontent.com/luach-sport/mycar/main/www/data/',
     'https://cdn.jsdelivr.net/gh/luach-sport/mycar@main/www/data/'
   ];
-  MC.FEEDBACK_TO = 'i0533101089@gmail.com';
+  // FormSubmit form id (an alias for the developer's inbox), so no e-mail address ships in the app.
+  MC.FEEDBACK_ID = '52c30c660b806a959f2e968e9e92a9ef';
 
   // ================= Helpers =================
   const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -86,6 +87,22 @@
   MC.sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   MC.isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s || '').trim());
 
+  // Shrinks big numbers that do not fit (large system font sizes, long amounts) instead of letting the page spill sideways.
+  MC.fitText = (root) => {
+    (root || document).querySelectorAll('.fit').forEach((el) => {
+      el.style.fontSize = '';
+      const box = (el.dataset.fitBox && el.closest(el.dataset.fitBox)) || el.parentElement;
+      if (!box) return;
+      let fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+      const min = fs * 0.5;
+      const tight = () => box.scrollWidth > box.clientWidth + 1 || (el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1);
+      for (let n = 0; n < 16 && tight() && fs > min; n++) {
+        fs *= 0.93;
+        el.style.fontSize = fs.toFixed(1) + 'px';
+      }
+    });
+  };
+
   // ================= Icons =================
   const P = {
     route: '<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
@@ -134,6 +151,8 @@
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
     calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
     drop: '<path d="M12 2.7s-7 7.6-7 12.3a7 7 0 0 0 14 0c0-4.7-7-12.3-7-12.3Z"/>',
+    image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
+    alert: '<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>',
     sparkle: '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>'
   };
   MC.icon = (name, cls) => '<svg class="i' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (P[name] || '') + '</svg>';

@@ -23,7 +23,7 @@
       settings: { theme: 'light', priceMode: 'auto', manualPrice: 0, fullService: false, activeCarId: null, lastTag: '' },
       cars: [], trips: [], fuel: [], places: [], routes: [], recent: [],
       reminders: { test: { on: false, date: '' }, insurance: { on: false, date: '' }, service: { on: false, every: 15000, lastKm: 0 } },
-      outbox: [], profile: { name: '', email: '' }, lastCalc: null, lastSync: 0
+      outbox: [], profile: { name: '', email: '' }, lastCalc: null, lastSync: 0, updateSeen: 0
     };
   }
   const isObj = (o) => o && typeof o === 'object' && !Array.isArray(o);
@@ -68,6 +68,7 @@
     if (isObj(raw.profile)) d.profile = { name: String(raw.profile.name || '').slice(0, 60), email: String(raw.profile.email || '').slice(0, 100) };
     if (isObj(raw.lastCalc)) d.lastCalc = raw.lastCalc;
     d.lastSync = +raw.lastSync || 0;
+    d.updateSeen = +raw.updateSeen || 0;
     return d;
   }
   const save = (now) => MC.saveRaw(MC.state, now);
@@ -133,6 +134,7 @@
     document.querySelectorAll('#tabs button[data-tab]').forEach((b) => {
       if (b.getAttribute('data-tab') === ui.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
     });
+    MC.fitText(main);
     if (keepScroll) window.scrollTo(0, y); else window.scrollTo(0, 0);
   }
   MC.render = render;
@@ -586,14 +588,17 @@
         '<div class="field"><label for="fbn">שם מלא *</label><input id="fbn" class="input" autocomplete="name" data-f="name" value="' + esc(f.name) + '" aria-required="true">' + (e.name ? '<span class="hint bad">' + e.name + '</span>' : '') + '</div>' +
         '<div class="field"><label for="fbe">אימייל *</label><input id="fbe" class="input ltr" style="text-align:left" type="email" inputmode="email" autocomplete="email" data-f="email" value="' + esc(f.email) + '" aria-required="true">' + (e.email ? '<span class="hint bad">' + e.email + '</span>' : '<span class="hint">כדי שנוכל לחזור אליך</span>') + '</div>' +
         '<div class="field"><label for="fbm">מה תרצה להגיד? *</label><textarea id="fbm" class="input" data-f="message" aria-required="true" placeholder="למשל: הייתי רוצה שהאפליקציה תזכיר לי לבדוק לחץ אוויר">' + esc(f.message) + '</textarea>' + (e.message ? '<span class="hint bad">' + e.message + '</span>' : '') + '</div>' +
-        '<button type="button" class="btn" data-action="send-feedback">' + icon('message') + 'שליחת הפנייה</button>' +
-        '<button type="button" class="btn ghost" data-action="feedback-mail">או שליחה דרך אפליקציית המייל</button>' +
+        '<button type="button" class="btn" data-action="send-feedback"' + (flushing ? ' aria-disabled="true"' : '') + '>' + icon('message') + (flushing ? 'שולח…' : 'שליחת הפנייה') + '</button>' +
         (MC.online() ? '' : '<p class="fine" style="margin:0;text-align:center">אין חיבור כרגע. הפנייה תישמר ותישלח לבד כשיחזור האינטרנט.</p>');
       if (box.length) {
         h += '<span class="section-label">הפניות שלי</span>';
         box.slice(0, 6).forEach((m) => {
-          h += '<div class="list-item"><span class="tile ' + (m.status === 'sent' ? 'green' : 'orange') + '">' + icon(m.status === 'sent' ? 'check' : 'clock') + '</span><span class="grow"><span class="t" style="font-size:14px">' + esc(String(m.message).slice(0, 60)) + (m.message.length > 60 ? '…' : '') + '</span><span class="s">' + esc(MC.dayLabel(m.ts)) + ' · ' + (m.status === 'sent' ? 'נשלחה' : 'ממתינה לחיבור') + '</span></span></div>';
+          const st = m.status === 'sent' ? { c: 'green', i: 'check', t: 'נשלחה ' + MC.time(m.sentAt || m.ts) }
+            : m.status === 'failed' ? { c: 'orange', i: 'alert', t: 'עוד לא נשלחה' + (m.error ? ': ' + m.error : '') }
+            : MC.online() ? { c: 'orange', i: 'clock', t: 'בשליחה…' } : { c: 'orange', i: 'clock', t: 'תישלח כשיחזור האינטרנט' };
+          h += '<div class="list-item"><span class="tile ' + st.c + '">' + icon(st.i) + '</span><span class="grow"><span class="t" style="font-size:14px">' + esc(String(m.message).slice(0, 60)) + (m.message.length > 60 ? '…' : '') + '</span><span class="s">' + esc(MC.dayLabel(m.ts)) + ' · ' + esc(st.t) + '</span></span></div>';
         });
+        if (box.some((m) => m.status !== 'sent') && MC.online() && !flushing) h += '<button type="button" class="btn secondary" data-action="feedback-retry">' + icon('refresh') + 'לנסות לשלוח שוב</button>';
       }
       return h;
     }
@@ -609,39 +614,101 @@
       '<div class="row"><span class="tile orange">' + icon('fuel') + '</span><span class="grow"><span class="t">יומן תדלוקים</span><span class="s">צריכה אמיתית, ק״מ לכל תדלוק ועלות לק״מ</span></span></div>' +
       '<div class="row"><span class="tile green">' + icon('offline') + '</span><span class="grow"><span class="t">עובד בלי אינטרנט</span><span class="s">הנתונים נשמרים רק בטלפון שלך</span></span></div></div>' +
       '<p class="fine">רשימת היישובים: הלשכה המרכזית לסטטיסטיקה. מסלולים וכתובות: OSRM ו-Nominatim, נתוני מפה © OpenStreetMap contributors. מחיר הדלק: מינהל הדלק והגז, משרד האנרגיה. המחירים והמרחקים הם הערכה, וייתכנו הבדלים מהמציאות.</p>' +
+      updateBlock() +
+      '<button type="button" class="btn secondary" data-action="share-app">' + icon('share') + 'שיתוף האפליקציה עם חברים</button>' +
       '<button type="button" class="btn secondary" data-action="open-sheet" data-sheet="feedback">' + icon('message') + 'פנייה / הצעת ייעול</button>'
+  };
+  function updateBlock() {
+    const U = MC.update;
+    if (!MC.canSelfUpdate()) return '';
+    if (U.info) return '<button type="button" class="notice blue" style="border:0;text-align:right" data-action="open-sheet" data-sheet="update">' + icon('sparkle', 'sm') + '<span class="grow">יש גרסה חדשה: ' + esc(U.info.version) + ' (בנייה ' + U.info.build + ')</span><span style="font-weight:700">לעדכון</span></button>';
+    return '<button type="button" class="btn secondary" data-action="check-update"' + (U.state === 'checking' ? ' aria-disabled="true"' : '') + '>' + icon('refresh') + (U.state === 'checking' ? 'בודק…' : 'בדיקת עדכונים') + '</button>';
+  }
+
+  // ---------- New version ----------
+  SHEETS.update = {
+    title: () => 'גרסה חדשה',
+    render: () => {
+      const U = MC.update, i = U.info;
+      const mine = 'אצלך: ' + esc(MC.VERSION.version) + ' (בנייה ' + esc(MC.VERSION.build) + ')';
+      if (!i) {
+        return '<div class="about-head"><img src="icon-512.png" alt=""><h2>MyCar</h2><span class="ver">' + mine + '</span></div>' +
+          '<div class="notice green">' + icon('check', 'sm') + '<span class="grow">יש לך את הגרסה האחרונה.</span></div>' +
+          '<button type="button" class="btn secondary" data-action="close-sheet">סגירה</button>';
+      }
+      let h = '<div class="about-head"><img src="icon-512.png" alt=""><h2>MyCar ' + esc(i.version) + '</h2><span class="ver">בנייה ' + i.build + ' · ' + mine + '</span></div>';
+      if (i.notes.length) h += '<div class="card"><span class="section-label" style="margin:0 0 8px">מה חדש</span><ul class="note-list">' + i.notes.map((n) => '<li>' + esc(n) + '</li>').join('') + '</ul></div>';
+      if (U.state === 'downloading' || U.state === 'applying') {
+        h += '<div class="field"><span class="label">' + (U.state === 'applying' ? 'מתקין… האפליקציה תיפתח מחדש' : 'מוריד את העדכון… ' + Math.round(U.progress) + '%') + '</span><div class="progress"><span style="width:' + (U.state === 'applying' ? 100 : Math.max(4, U.progress)) + '%"></span></div></div>';
+      } else if (i.inApp) {
+        h += '<button type="button" class="btn" data-action="update-now">' + icon('download') + 'עדכון עכשיו</button>' +
+          '<p class="fine" style="margin:0;text-align:center">העדכון נכנס בתוך האפליקציה, בלי להתקין קובץ. כל הנתונים שלך נשארים.</p>';
+      } else {
+        h += '<a class="btn" href="' + esc(MC.APK_URL) + '" target="_blank" rel="noopener">' + icon('download') + 'הורדת הגרסה החדשה</a>' +
+          '<p class="fine" style="margin:0;text-align:center">הגרסה הזו כוללת שינוי במנוע של האפליקציה, ולכן מתקינים אותה פעם אחת מעל הקיימת. כל הנתונים נשמרים.</p>';
+      }
+      if (U.error) h += '<div class="notice orange">' + icon('alert', 'sm') + '<span class="grow">' + esc(U.error) + '</span></div>';
+      if (U.state !== 'applying') h += '<button type="button" class="btn secondary" data-action="update-later">אחר כך</button>';
+      return h;
+    }
+  };
+
+  // ---------- Share chooser ----------
+  SHEETS.share = {
+    title: () => 'שיתוף',
+    render: () => '<button type="button" class="btn" data-action="share-image">' + icon('image') + 'שיתוף כתמונה</button>' +
+      '<button type="button" class="btn secondary" data-action="share-text">' + icon('message') + 'שיתוף כטקסט</button>'
   };
 
   // ================= Feedback sending =================
+  // Sent through FormSubmit straight to the developer's inbox. The form id is an alias, so the
+  // developer's address is not in the app, and the sender only gets a reply if the developer answers.
+  const FEEDBACK_TYPES = { idea: 'הצעת ייעול', bug: 'תקלה', other: 'אחר' };
   let flushing = false;
   async function flushOutbox() {
-    if (flushing || !MC.online()) return;
+    if (flushing || !MC.online()) return 0;
     const pending = MC.state.outbox.filter((m) => m.status !== 'sent');
-    if (!pending.length) return;
+    if (!pending.length) return 0;
     flushing = true;
+    if (ui.sheet && ui.sheet.name === 'feedback') renderSheet();
     let sent = 0;
     try {
       for (const m of pending) {
-        const typeLabel = { idea: 'הצעת ייעול', bug: 'תקלה', other: 'אחר' }[m.type] || 'פנייה';
+        const typeLabel = FEEDBACK_TYPES[m.type] || 'פנייה';
         const body = {
-          name: m.name, email: m.email, _replyto: m.email,
           _subject: 'MyCar – ' + typeLabel + ' מ' + m.name,
-          _captcha: 'false', _template: 'table',
-          'סוג הפנייה': typeLabel, 'הודעה': m.message,
-          'גרסה': MC.VERSION.version + ' (' + MC.VERSION.build + ')',
-          'מכשיר': MC.isNative() ? 'אנדרואיד' : 'דפדפן', 'נשלח': new Date(m.ts).toLocaleString('he-IL')
+          _replyto: m.email, _captcha: 'false', _template: 'table',
+          'שם השולח': m.name,
+          'מייל השולח': m.email,
+          'תאריך ושעה': MC.dateFull(m.ts) + ' ' + MC.time(m.ts),
+          'סוג הפנייה': typeLabel,
+          'הפנייה': m.message,
+          'גרסה': MC.VERSION.version + ' (בנייה ' + MC.VERSION.build + ')',
+          'מכשיר': MC.isNative() ? 'אנדרואיד' : 'דפדפן'
         };
+        m.tries = (m.tries || 0) + 1;
         try {
-          const r = await MC.http('https://formsubmit.co/ajax/' + MC.FEEDBACK_TO, { method: 'POST', data: body, timeout: 15000, headers: { Referer: MC.PAGES_URL, Origin: MC.PAGES_URL.replace(/\/mycar\/$/, '') } });
-          const d = r.data || {};
-          const ok = r.ok && (d.success === true || d.success === 'true' || /activat/i.test(String(d.message || '')));
-          if (ok) { m.status = 'sent'; m.sentAt = Date.now(); sent++; } else console.warn('feedback', r.status, d);
-        } catch (e) { console.warn('feedback send', e && e.message); break; }
+          const r = await MC.http('https://formsubmit.co/ajax/' + MC.FEEDBACK_ID, { method: 'POST', data: body, timeout: 30000, headers: { Referer: MC.PAGES_URL, Origin: MC.PAGES_URL.replace(/\/mycar\/$/, '') } });
+          const d = r.data && typeof r.data === 'object' ? r.data : {};
+          const msg = String(d.message || (typeof r.data === 'string' ? r.data : '')).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (r.ok && (d.success === true || d.success === 'true')) {
+            m.status = 'sent'; m.sentAt = Date.now(); delete m.error; delete m.detail; sent++;
+          } else {
+            m.status = 'failed';
+            m.error = /activat/i.test(msg) ? 'מחכה לאישור חד-פעמי במייל של המפתח' : 'השרת לא קיבל אותה' + (r.status && !r.ok ? ' (' + r.status + ')' : '');
+            m.detail = msg.slice(0, 200);
+            console.warn('feedback', r.status, msg);
+          }
+        } catch (e) {
+          m.status = 'failed'; m.error = 'אין תשובה מהשרת'; m.detail = String(e && e.message || e).slice(0, 200);
+          console.warn('feedback send', m.detail);
+          break;
+        }
       }
     } finally {
       flushing = false;
       save();
-      if (sent && ui.sheet && ui.sheet.name === 'feedback') renderSheet();
+      if (ui.sheet && ui.sheet.name === 'feedback') renderSheet();
     }
     return sent;
   }
@@ -765,7 +832,56 @@
     lines.push('', 'חושב ב-MyCar · עד הטיפה האחרונה');
     return lines.join('\n');
   }
-  A['share-result'] = () => { const r = ui.result; if (!r || !r.calc) return; shareText(tripText({ title: r.title, km: r.calc.km, liters: r.calc.liters, cost: r.calc.cost, passengers: r.calc.pax, roundTrip: r.roundTrip })); };
+  A['share-result'] = () => { const r = ui.result; if (!r || !r.calc) return; openSheet('share', { kind: 'result' }); };
+  function shareTarget(d) {
+    if (d.kind === 'trip') return MC.state.trips.find((x) => x.id === d.id) || null;
+    const r = ui.result;
+    return r && r.calc ? { title: r.title, km: r.calc.km, liters: r.calc.liters, cost: r.calc.cost, passengers: r.calc.pax, roundTrip: r.roundTrip } : null;
+  }
+  // The parts of the screen that go into the picture (buttons and the slider stay out).
+  function snapNodes(d) {
+    const out = [];
+    const clean = (n) => { n.querySelectorAll('button.round-btn, input, .field, [data-action="open-sheet"] > span:last-child').forEach((x) => x.remove()); return n; };
+    if (d.kind === 'trip') {
+      const t = MC.state.trips.find((x) => x.id === d.id);
+      if (!t) return out;
+      const head = document.createElement('div');
+      head.className = 'bar-top';
+      head.innerHTML = '<div class="titles"><span class="kicker">' + esc(MC.dateFull(t.ts)) + (t.roundTrip ? ' · הלוך-חזור' : '') + '</span><h1>' + esc(t.title) + '</h1></div>';
+      out.push(head);
+      const tmp = document.createElement('div');
+      tmp.innerHTML = SHEETS.trip.render({ id: d.id });
+      ['.hero', '.card'].forEach((sel) => { const n = tmp.querySelector(sel); if (n) out.push(clean(n)); });
+      return out;
+    }
+    const main = $('#screen');
+    ['.bar-top', '.hero', '.card', '.grid2', 'button.notice'].forEach((sel) => { const n = main.querySelector(sel); if (n) out.push(clean(n.cloneNode(true))); });
+    return out;
+  }
+  A['share-text'] = () => { const d = ui.sheet && ui.sheet.data; const t = d && shareTarget(d); closeSheet(); if (t) shareText(tripText(t)); };
+  A['share-image'] = async (el) => {
+    const d = ui.sheet && ui.sheet.data;
+    if (!d || ui.snapping) return;
+    ui.snapping = true;
+    el.innerHTML = icon('image') + 'מכין תמונה…';
+    el.setAttribute('aria-disabled', 'true');
+    try {
+      const png = await MC.snap(snapNodes(d));
+      closeSheet();
+      await MC.shareImage(png, 'MyCar-' + MC.dateInput(Date.now()) + '-' + Date.now().toString(36).slice(-4) + '.png', 'שיתוף נסיעה');
+    } catch (e) {
+      console.warn('share image', e && e.message);
+      toast('לא הצלחתי ליצור תמונה. אפשר לשתף כטקסט.');
+      if (ui.sheet && ui.sheet.name === 'share') renderSheet();
+    } finally { ui.snapping = false; }
+  };
+  A['share-app'] = () => shareText('MyCar – עד הטיפה האחרונה\nכמה עולה כל נסיעה, יומן נסיעות ותדלוקים, עובד גם בלי אינטרנט.\n\nלהורדה לאנדרואיד:\n' + MC.APK_URL);
+  A['check-update'] = async () => {
+    const i = await MC.update.check(true);
+    if (i) openSheet('update'); else toast(MC.update.error || 'יש לך את הגרסה האחרונה');
+  };
+  A['update-now'] = () => MC.update.apply();
+  A['update-later'] = () => { if (MC.update.info) { MC.state.updateSeen = MC.update.info.build; save(); } closeSheet(); };
   A['open-price'] = () => openSheet('price');
   A['set-price-mode'] = (el) => {
     MC.state.settings.priceMode = el.dataset.v;
@@ -782,7 +898,7 @@
   A['trips-filter'] = (el) => { ui.tripsFilter = el.dataset.v; render(true); };
   A['open-trip'] = (el) => openSheet('trip', { id: el.dataset.id });
   A['trip-tag'] = (el) => { const t = MC.state.trips.find((x) => x.id === ui.sheet.data.id); if (t) { t.tag = el.dataset.v; save(); renderSheet(); render(true); } };
-  A['trip-share'] = () => { const t = MC.state.trips.find((x) => x.id === ui.sheet.data.id); if (t) shareText(tripText(t)); };
+  A['trip-share'] = () => { const id = ui.sheet.data.id; if (MC.state.trips.some((x) => x.id === id)) openSheet('share', { kind: 'trip', id }); };
   A['trip-again'] = () => {
     const t = MC.state.trips.find((x) => x.id === ui.sheet.data.id); if (!t || !t.from || !t.to) return;
     Object.assign(ui.calc, { from: t.from, to: t.to, roundTrip: t.roundTrip, passengers: t.passengers || 1, manual: false });
@@ -914,16 +1030,13 @@
     if (String(f.message || '').trim().length < 5) err.message = 'כתוב לפחות כמה מילים';
     return err;
   }
-  A['feedback-mail'] = () => {
-    const f = ui.form;
-    f.err = feedbackErrors(f);
-    if (Object.keys(f.err).length) { renderSheet(); return; }
-    const typeLabel = { idea: 'הצעת ייעול', bug: 'תקלה', other: 'פנייה' }[f.type] || 'פנייה';
-    const body = f.message.trim() + '\n\n— ' + f.name.trim() + ' (' + f.email.trim() + ')\nMyCar ' + MC.VERSION.version + ' (' + MC.VERSION.build + ')';
-    MC.state.profile = { name: f.name.trim(), email: f.email.trim() }; save();
-    window.location.href = 'mailto:' + MC.FEEDBACK_TO + '?subject=' + encodeURIComponent('MyCar – ' + typeLabel + ' מ' + f.name.trim()) + '&body=' + encodeURIComponent(body);
+  A['feedback-retry'] = async () => {
+    if (!MC.online()) { toast('אין חיבור כרגע'); return; }
+    const n = await flushOutbox();
+    toast(n ? 'נשלח. תודה!' : 'עדיין לא הצלחתי לשלוח. ננסה שוב לבד.');
   };
   A['send-feedback'] = async () => {
+    if (flushing) return;
     const f = ui.form, err = feedbackErrors(f);
     f.err = err;
     if (Object.keys(err).length) { renderSheet(); return; }
@@ -1015,6 +1128,8 @@
     document.addEventListener('input', onInput);
     document.addEventListener('change', onChange);
     document.addEventListener('keydown', onKey);
+    let fitT = 0;
+    window.addEventListener('resize', () => { clearTimeout(fitT); fitT = setTimeout(() => MC.fitText($('#screen')), 150); });
     await MC.initNetwork();
     MC.state = normalize(await MC.loadRaw());
     applyTheme();
@@ -1027,14 +1142,24 @@
     if (!MC.state.onboarded) openSheet('welcome');
     if (MC.isNative()) {
       MC.listen('App', 'backButton', onBack);
-      MC.listen('App', 'appStateChange', (st) => { if (st && st.isActive) { backgroundSync(); flushOutbox(); } });
+      MC.listen('App', 'appStateChange', (st) => { if (st && st.isActive) { backgroundSync(); flushOutbox(); autoUpdateCheck(); } });
     }
+    MC.onUpdate(() => {
+      if (ui.sheet && (ui.sheet.name === 'update' || ui.sheet.name === 'about')) renderSheet();
+      else if (!ui.sheet && ui.tab === 'settings' && ui.view !== 'result') render(true);
+    });
     MC.onNetwork((on) => {
       if (!ui.sheet) render(true); else if (ui.sheet.name === 'offline' || ui.sheet.name === 'feedback' || ui.sheet.name === 'picker') { if (ui.sheet.name === 'picker') refreshPicker(); else renderSheet(); }
-      if (on) { backgroundSync(); flushOutbox(); }
+      if (on) { backgroundSync(); flushOutbox(); autoUpdateCheck(); }
     });
     backgroundSync();
     flushOutbox();
+    autoUpdateCheck();
+  }
+  // Looks for a new version when the app opens; shows it once per version.
+  async function autoUpdateCheck() {
+    const info = await MC.update.check(false);
+    if (info && info.build > (MC.state.updateSeen || 0) && !ui.sheet && MC.state.onboarded) openSheet('update');
   }
 
   // Small test surface for automated checks.

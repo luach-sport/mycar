@@ -16,6 +16,19 @@
       "backgroundColor": "#F3F6FC",
       "style": "LIGHT",
       "overlaysWebView": false
+    },
+    "CapacitorUpdater": {
+      "autoUpdate": false,
+      "statsUrl": "",
+      "updateUrl": "",
+      "channelUrl": "",
+      "allowModifyUrl": false,
+      "appReadyTimeout": 15000,
+      "autoDeleteFailed": true,
+      "autoDeletePrevious": true,
+      "resetWhenUpdate": true,
+      "shakeMenu": false,
+      "disableJSLogging": true
     }
   }
 }

@@ -6,3 +6,4 @@ www/cap-runtime.js
 .DS_Store
 
 !signing/release.jks
+dist/

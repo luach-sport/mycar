@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - 'README.md'
+      - 'update.json'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      APP_VERSION: '1.01'
+      APP_VERSION: '1.02'
     steps:
       - uses: actions/checkout@v5
 
@@ -36,6 +37,20 @@ jobs:
 
       - name: Install packages
         run: npm install --no-audit --no-fund
+
+      - name: Release key for in-app updates
+        env:
+          MYCAR_KEY_PASS: ${{ secrets.MYCAR_KEY_PASS }}
+        run: |
+          if [ -z "$MYCAR_KEY_PASS" ]; then echo "::warning::No signing password, in-app updates are off in this build"; exit 0; fi
+          KD="$RUNNER_TEMP/update-key"; mkdir -p "$KD"; chmod 700 "$KD"
+          if ! openssl pkcs12 -in signing/release.jks -passin env:MYCAR_KEY_PASS -nocerts -nodes -out "$KD/p.pem" 2>/dev/null; then
+            openssl pkcs12 -legacy -in signing/release.jks -passin env:MYCAR_KEY_PASS -nocerts -nodes -out "$KD/p.pem"
+          fi
+          openssl pkey -in "$KD/p.pem" -out "$KD/key.pem"
+          rm -f "$KD/p.pem"
+          openssl pkey -in "$KD/key.pem" -pubout -out "$KD/pub.pem"
+          echo "UPDATE_KEY_DIR=$KD" >> "$GITHUB_ENV"
 
       - name: Refresh offline data (road distances, fuel price)
         continue-on-error: true
@@ -107,14 +122,41 @@ jobs:
           "$BT/apksigner" verify --print-certs mycar.apk | head -5 || true
           "$BT/aapt" dump badging mycar.apk 2>/dev/null | grep -E "package|sdkVersion|targetSdk|application-label" | head -6 || true
 
+      - name: Build in-app update (signed)
+        if: steps.key.outputs.signed == 'true' && env.UPDATE_KEY_DIR != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export TAG="v${APP_VERSION}-build${GITHUB_RUN_NUMBER}"
+          mkdir -p "$RUNNER_TEMP/prev"
+          gh release download --pattern update.json --dir "$RUNNER_TEMP/prev" 2>/dev/null || echo "no earlier update.json"
+          PREV_UPDATE="$RUNNER_TEMP/prev/update.json" node scripts/make-update.mjs
+          rm -rf "$UPDATE_KEY_DIR"
+
       - name: Publish release
         if: steps.key.outputs.signed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="v${APP_VERSION}-build${GITHUB_RUN_NUMBER}"
-          NOTES=$'MyCar — עד הטיפה האחרונה. גרסה '"${APP_VERSION}"$' (בנייה '"${GITHUB_RUN_NUMBER}"$')\n\nלהתקנה: מורידים את mycar.apk בטלפון ופותחים אותו. בהתקנה הראשונה מאשרים "התקנה ממקור לא ידוע".\nעדכון: מתקינים את הקובץ החדש מעל הקיים. הנתונים נשמרים.'
-          gh release create "$TAG" mycar.apk --title "MyCar ${APP_VERSION} (בנייה ${GITHUB_RUN_NUMBER})" --notes "$NOTES" --latest
+          WHATS_NEW=""
+          if [ -f release-notes.txt ]; then WHATS_NEW=$'\n\nמה חדש:\n'"$(sed 's/^/• /' release-notes.txt)"; fi
+          NOTES=$'MyCar — עד הטיפה האחרונה. גרסה '"${APP_VERSION}"$' (בנייה '"${GITHUB_RUN_NUMBER}"$')'"${WHATS_NEW}"$'\n\nלהתקנה: מורידים את mycar.apk בטלפון ופותחים אותו. בהתקנה הראשונה מאשרים "התקנה ממקור לא ידוע".\nמגרסה 1.02 העדכונים נכנסים מתוך האפליקציה. הנתונים תמיד נשמרים.'
+          ASSETS=(mycar.apk)
+          if [ -f dist/bundle.zip ] && [ -f dist/update.json ]; then ASSETS+=(dist/bundle.zip dist/update.json); fi
+          gh release create "$TAG" "${ASSETS[@]}" --title "MyCar ${APP_VERSION} (בנייה ${GITHUB_RUN_NUMBER})" --notes "$NOTES" --latest
+
+      - name: Point the repo at the new update (backup source for the app)
+        if: steps.key.outputs.signed == 'true'
+        continue-on-error: true
+        run: |
+          [ -f dist/update.json ] || exit 0
+          cp dist/update.json update.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add update.json
+          git commit -q -m "גרסה זמינה לעדכון: ${APP_VERSION} (בנייה ${GITHUB_RUN_NUMBER})"
+          git pull -q --rebase origin main && git push -q || echo "::warning::could not push update.json"
 
       - name: Keep the test APK
         if: steps.key.outputs.signed != 'true'

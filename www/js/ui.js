@@ -90,13 +90,13 @@
       '<div class="titles"><span class="kicker">' + esc(car.name) + (r.roundTrip ? ' · הלוך-חזור' : '') + '</span><h1>' + esc(r.title) + '</h1></div>' +
       '<button type="button" class="round-btn" aria-label="שתף" data-action="share-result">' + icon('share') + '</button></div>';
     h += '<div class="hero"><div class="head"><div style="display:flex;flex-direction:column;gap:6px">' +
-      '<span class="lbl">עלות דלק משוערת</span><div class="amount num"><span class="cur">₪</span><span class="val">' + fmt(x.cost, 2) + '</span></div>' +
+      '<span class="lbl">עלות דלק משוערת</span><div class="amount num"><span class="cur">₪</span><span class="val fit" data-fit-box=".head">' + fmt(x.cost, 2) + '</span></div>' +
       '<span class="source">' + icon(src.i, 'sm') + esc(src.t) + '</span></div>' +
       (x.tankPct != null ? '<div class="gauge">' + gaugeSvg(x.tankPct) + '<span>' + fmt(Math.round(x.tankPct * 100)) + '% מהמיכל</span></div>' : '') +
       '</div><div class="stat3">' +
-      '<div><b class="num">' + km(x.km) + '</b><span>קילומטר</span></div>' +
-      '<div><b class="num">' + fmt(x.liters, 1) + '</b><span>ליטר דלק</span></div>' +
-      (x.min > 0 ? '<div><b class="num">' + MC.dur(x.min) + '</b><span>' + MC.durUnit(x.min) + '</span></div>' : '<div><b class="num">' + money(x.cpk) + '</b><span>לקילומטר</span></div>') +
+      '<div><b class="num fit">' + km(x.km) + '</b><span>קילומטר</span></div>' +
+      '<div><b class="num fit">' + fmt(x.liters, 1) + '</b><span>ליטר דלק</span></div>' +
+      (x.min > 0 ? '<div><b class="num fit">' + MC.dur(x.min) + '</b><span>' + MC.durUnit(x.min) + '</span></div>' : '<div><b class="num fit">' + money(x.cpk) + '</b><span>לקילומטר</span></div>') +
       '</div></div>';
     if (r.route.source === 'offline') {
       h += '<div class="notice blue">' + icon('info', 'sm') + '<span class="grow">המרחק משוער לפי מרחקי כבישים שנשמרו במכשיר. כשתתחבר לאינטרנט החישוב יהיה לפי המסלול המדויק.</span></div>';
@@ -112,9 +112,9 @@
       (x.cons.learned ? '<span class="tag green" style="align-self:flex-start">הצריכה מותאמת לתדלוקים שלך (' + (x.cons.factor > 1 ? '+' : '−') + fmt(Math.abs(x.cons.factor - 1) * 100) + '%)</span>' : '') +
       '</div>';
     h += '<div class="grid2">' +
-      '<div class="mini"><span class="l">' + (r.roundTrip ? 'כיוון אחד' : 'הלוך-חזור') + '</span><span class="b num">' + money(r.roundTrip ? x.oneWayCost : x.roundCost) + '</span></div>' +
-      (x.pax > 1 ? '<div class="mini orange"><span class="l">לכל נוסע (' + x.pax + ')</span><span class="b num">' + money(x.perPax) + '</span></div>'
-        : '<div class="mini"><span class="l">עלות לקילומטר</span><span class="b num">' + money(x.cpk) + '</span></div>') +
+      '<div class="mini"><span class="l">' + (r.roundTrip ? 'כיוון אחד' : 'הלוך-חזור') + '</span><span class="b num fit">' + money(r.roundTrip ? x.oneWayCost : x.roundCost) + '</span></div>' +
+      (x.pax > 1 ? '<div class="mini orange"><span class="l">לכל נוסע (' + x.pax + ')</span><span class="b num fit">' + money(x.perPax) + '</span></div>'
+        : '<div class="mini"><span class="l">עלות לקילומטר</span><span class="b num fit">' + money(x.cpk) + '</span></div>') +
       '</div>';
     h += '<button type="button" class="notice gray" style="border:1px solid var(--line);text-align:right" data-action="open-sheet" data-sheet="price">' + icon('fuel', 'sm') + '<span class="grow">' + money(x.price) + ' לליטר · ' + esc(x.priceSrc) + '</span><span style="color:var(--primary-text);font-weight:700">שינוי</span></button>';
     if (!r.savedId) {
@@ -140,7 +140,7 @@
       '<button type="button" class="round-btn" aria-label="החודש הקודם" data-action="trips-month" data-d="-1">' + icon('chevR', 'sm') + '</button>' +
       '<span style="font-size:14px;font-weight:700;min-width:92px;text-align:center">' + esc(MC.monthLabel(mk)) + '</span>' +
       '<button type="button" class="round-btn" aria-label="החודש הבא" data-action="trips-month" data-d="1">' + icon('chevL', 'sm') + '</button></div></div>';
-    h += '<div class="summary"><div><b class="num">' + list.length + '</b><span>נסיעות</span></div><div><b class="num">' + km(sum.km) + '</b><span>קילומטר</span></div><div><b class="num">' + money0(sum.cost) + '</b><span>על דלק</span></div></div>';
+    h += '<div class="summary"><div><b class="num fit">' + list.length + '</b><span>נסיעות</span></div><div><b class="num fit">' + km(sum.km) + '</b><span>קילומטר</span></div><div><b class="num fit">' + money0(sum.cost) + '</b><span>על דלק</span></div></div>';
     h += '<div class="chips">' + [['all', 'הכל'], ['work', 'עבודה'], ['private', 'פרטי']].map(([v, l]) =>
       '<button type="button" class="chip sm" data-action="trips-filter" data-v="' + v + '" aria-pressed="' + (ui.tripsFilter === v ? 'true' : 'false') + '">' + l + '</button>').join('') +
       (list.length ? '<button type="button" class="chip sm dashed" data-action="export-csv">' + icon('download', 'sm') + 'ייצוא לאקסל</button>' : '') + '</div>';
@@ -192,8 +192,8 @@
     }
     h += '</div>';
     const st = MC.computeStats(car.id, 'month');
-    h += '<div class="grid2"><div class="mini"><span class="l">תדלקת החודש</span><span class="b num">' + money0(st.spent) + '</span></div>' +
-      '<div class="mini"><span class="l">עלות לקילומטר</span><span class="b num">' + (a.cpkAll ? money(a.cpkAll) : '–') + '</span></div></div>';
+    h += '<div class="grid2"><div class="mini"><span class="l">תדלקת החודש</span><span class="b num fit">' + money0(st.spent) + '</span></div>' +
+      '<div class="mini"><span class="l">עלות לקילומטר</span><span class="b num fit">' + (a.cpkAll ? money(a.cpkAll) : '–') + '</span></div></div>';
     if (!a.rows.length) {
       h += '<div class="empty" style="padding-top:18px"><b>עוד לא נרשמו תדלוקים</b><span>לוחצים על "תדלוק חדש" אחרי שמתדלקים.</span></div>';
     }
@@ -246,10 +246,10 @@
       '<b style="font-size:16px">' + esc(label) + ' · ' + esc(car.name) + '</b>' +
       '<button type="button" class="round-btn" aria-label="התקופה הבאה" data-action="stats-nav" data-d="1">' + icon('chevL', 'sm') + '</button></div>';
     h += '<div class="grid2">' +
-      '<div class="mini"><span class="l">הוצאה על דלק</span><span class="b num">' + money0(st.spent) + '</span></div>' +
-      '<div class="mini"><span class="l">קילומטרים' + (st.km && !st.kmFromOdo ? ' (לפי נסיעות)' : '') + '</span><span class="b num">' + (st.km ? km(st.km) : '–') + '</span></div>' +
-      '<div class="mini"><span class="l">צריכה ממוצעת</span><span class="b num">' + (st.avg ? kmpl(st.avg) + ' <small>ק״מ/ל׳</small>' : '–') + '</span></div>' +
-      '<div class="mini"><span class="l">עלות לקילומטר</span><span class="b num">' + (st.cpk ? money(st.cpk) : '–') + '</span></div></div>';
+      '<div class="mini"><span class="l">הוצאה על דלק</span><span class="b num fit">' + money0(st.spent) + '</span></div>' +
+      '<div class="mini"><span class="l">קילומטרים' + (st.km && !st.kmFromOdo ? ' (לפי נסיעות)' : '') + '</span><span class="b num fit">' + (st.km ? km(st.km) : '–') + '</span></div>' +
+      '<div class="mini"><span class="l">צריכה ממוצעת</span><span class="b num fit">' + (st.avg ? kmpl(st.avg) + ' <small>ק״מ/ל׳</small>' : '–') + '</span></div>' +
+      '<div class="mini"><span class="l">עלות לקילומטר</span><span class="b num fit">' + (st.cpk ? money(st.cpk) : '–') + '</span></div></div>';
     const max = Math.max(1, Math.max.apply(null, st.series.map((s) => s.v)));
     h += '<div class="card" style="display:flex;flex-direction:column;gap:12px"><h2 class="h2">הוצאה חודשית על דלק</h2>' +
       '<div class="bars" role="img" aria-label="' + esc(st.series.map((s) => s.label + ' ' + Math.round(s.v)).join(', ')) + '">' +
@@ -280,7 +280,7 @@
       '<div style="display:flex;align-items:center;gap:12px"><span class="tile big solid">' + icon('car', 'lg') + '</span><div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><b style="font-size:17px">' + esc(car.name) + (car.year ? ' ' + esc(car.year) : '') + '</b>' +
       '<span style="font-size:13px;color:var(--muted)">' + esc(MC.FUEL_LABEL[car.fuelType]) + (car.tank ? ' · מיכל ' + fmt(car.tank) + ' ל׳' : '') + '</span></div>' +
       '<button type="button" class="round-btn" aria-label="עריכת הרכב" data-action="edit-car" data-id="' + car.id + '">' + icon('edit', 'sm') + '</button></div>' +
-      '<div class="grid2"><div class="mini orange"><span class="l">עירוני</span><span class="b num">' + kmpl(car.urban) + ' <small>ק״מ/ל׳</small></span></div><div class="mini blue"><span class="l">בין-עירוני</span><span class="b num">' + kmpl(car.inter) + ' <small>ק״מ/ל׳</small></span></div></div>' +
+      '<div class="grid2"><div class="mini orange"><span class="l">עירוני</span><span class="b num fit">' + kmpl(car.urban) + ' <small>ק״מ/ל׳</small></span></div><div class="mini blue"><span class="l">בין-עירוני</span><span class="b num fit">' + kmpl(car.inter) + ' <small>ק״מ/ל׳</small></span></div></div>' +
       '<div style="display:flex;align-items:center;gap:10px"><span style="flex:1;font-size:14px;font-weight:500">ללמוד את הצריכה מהתדלוקים</span>' + sw('toggle-learn', car.learn, 'ללמוד את הצריכה מהתדלוקים', ' data-id="' + car.id + '"') + '</div></div>';
     s.cars.filter((c) => c.id !== car.id).forEach((c) => {
       h += '<div class="list-item"><span class="tile gray">' + icon('car') + '</span><span class="grow"><span class="t">' + esc(c.name) + (c.year ? ' ' + esc(c.year) : '') + '</span><span class="s num">' + kmpl(c.urban) + ' / ' + kmpl(c.inter) + ' ק״מ/ל׳</span></span>' +
@@ -295,7 +295,7 @@
       row('offline', 'offline', '', 'נתונים במכשיר (בלי אינטרנט)', MC.data.places.length ? fmt(MC.data.places.length) + ' יישובים' + (MC.data.roads ? ' · מרחקי כבישים' : '') + (off ? ' · מחיר ' + MC.monthLabel(off.month).split(' ')[0] : '') : 'טוען…') +
       row('backup', 'download', 'green', 'גיבוי, שחזור וייצוא לאקסל', 'כל הנתונים נשמרים רק בטלפון שלך') +
       row('feedback', 'message', '', 'פנייה / הצעת ייעול', 'מה להוסיף? מה לשפר? כתוב לנו') +
-      row('about', 'info', 'gray', 'אודות MyCar', 'גרסה ' + MC.VERSION.version) + '</div>';
+      row('about', 'info', MC.update && MC.update.info ? '' : 'gray', 'אודות MyCar', 'גרסה ' + MC.VERSION.version + (MC.update && MC.update.info ? ' · יש גרסה חדשה' : ' · שיתוף ועדכונים')) + '</div>';
     h += '<p class="credit">MyCar · גרסה ' + esc(MC.VERSION.version) + ' · פותח על ידי <b>Itzko</b></p>';
     return h;
   };
