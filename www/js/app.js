@@ -661,12 +661,12 @@
   };
 
   // ================= Feedback sending =================
-  // Sent through FormSubmit straight to the developer's inbox. The form id is an alias, so the
-  // developer's address is not in the app, and the sender only gets a reply if the developer answers.
-  const FEEDBACK_TYPES = { idea: 'הצעת ייעול', bug: 'תקלה', other: 'אחר' };
+  // Sent to the developer's own Google Apps Script, which e-mails only the developer.
+  // The developer's address is not in the app; the sender gets a reply only if the developer answers.
   let flushing = false;
+  const FEEDBACK_ERRORS = { 'rate-limit': 'יותר מדי פניות כרגע, ננסה שוב מאוחר יותר', invalid: 'חסר שם, מייל או תוכן', 'bad-key': 'השרת דחה את הפנייה', server: 'תקלה זמנית בשרת' };
   async function flushOutbox() {
-    if (flushing || !MC.online()) return 0;
+    if (flushing || !MC.online() || !MC.FEEDBACK_URL) return 0;
     const pending = MC.state.outbox.filter((m) => m.status !== 'sent');
     if (!pending.length) return 0;
     flushing = true;
@@ -674,30 +674,26 @@
     let sent = 0;
     try {
       for (const m of pending) {
-        const typeLabel = FEEDBACK_TYPES[m.type] || 'פנייה';
         const body = {
-          _subject: 'MyCar – ' + typeLabel + ' מ' + m.name,
-          _replyto: m.email, _captcha: 'false', _template: 'table',
-          'שם השולח': m.name,
-          'מייל השולח': m.email,
-          'תאריך ושעה': MC.dateFull(m.ts) + ' ' + MC.time(m.ts),
-          'סוג הפנייה': typeLabel,
-          'הפנייה': m.message,
-          'גרסה': MC.VERSION.version + ' (בנייה ' + MC.VERSION.build + ')',
-          'מכשיר': MC.isNative() ? 'אנדרואיד' : 'דפדפן'
+          key: MC.FEEDBACK_KEY, name: m.name, email: m.email, type: m.type, message: m.message,
+          when: MC.dateFull(m.ts) + ' ' + MC.time(m.ts),
+          version: MC.VERSION.version + ' (בנייה ' + MC.VERSION.build + ')',
+          device: MC.isNative() ? 'אנדרואיד' : 'דפדפן'
         };
         m.tries = (m.tries || 0) + 1;
         try {
-          const r = await MC.http('https://formsubmit.co/ajax/' + MC.FEEDBACK_ID, { method: 'POST', data: body, timeout: 30000, headers: { Referer: MC.PAGES_URL, Origin: MC.PAGES_URL.replace(/\/mycar\/$/, '') } });
-          const d = r.data && typeof r.data === 'object' ? r.data : {};
-          const msg = String(d.message || (typeof r.data === 'string' ? r.data : '')).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-          if (r.ok && (d.success === true || d.success === 'true')) {
+          const r = await MC.http(MC.FEEDBACK_URL, { method: 'POST', data: body, plain: true, timeout: 30000 });
+          let d = r.data;
+          if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } }
+          d = d && typeof d === 'object' ? d : {};
+          if ((r.ok && d.ok === true) || r.status === 302 || r.status === 303) {
             m.status = 'sent'; m.sentAt = Date.now(); delete m.error; delete m.detail; sent++;
           } else {
             m.status = 'failed';
-            m.error = /activat/i.test(msg) ? 'מחכה לאישור חד-פעמי במייל של המפתח' : 'השרת לא קיבל אותה' + (r.status && !r.ok ? ' (' + r.status + ')' : '');
-            m.detail = msg.slice(0, 200);
-            console.warn('feedback', r.status, msg);
+            m.error = FEEDBACK_ERRORS[d.error] || 'השרת לא קיבל אותה' + (r.status && !r.ok ? ' (' + r.status + ')' : '');
+            m.detail = String(d.error || r.status || '').slice(0, 100);
+            console.warn('feedback', r.status, d.error);
+            if (d.error === 'rate-limit') break;
           }
         } catch (e) {
           m.status = 'failed'; m.error = 'אין תשובה מהשרת'; m.detail = String(e && e.message || e).slice(0, 200);
