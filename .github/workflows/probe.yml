@@ -1,0 +1,21 @@
+name: FormSubmit probe
+on:
+  push:
+    branches: [claude/formsubmit-probe]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post a test submission like the app does
+        run: |
+          NOW=$(TZ=Asia/Jerusalem date '+%d.%m.%Y %H:%M')
+          for TARGET in i0533101089@gmail.com 52c30c660b806a959f2e968e9e92a9ef; do
+            echo "=== target: $TARGET"
+            BODY=$(jq -n --arg now "$NOW" '{"_subject":"MyCar – בדיקת מערכת","_captcha":"false","_template":"table","_replyto":"i0533101089@gmail.com","שם השולח":"בדיקה אוטומטית","מייל":"i0533101089@gmail.com","תאריך ושעה":$now,"סוג הפנייה":"בדיקה","הפנייה":"בדיקה שהפניות מהאפליקציה מגיעות למייל"}')
+            curl -sS -m 60 -o resp.txt -w 'HTTP %{http_code} in %{time_total}s\n' -X POST "https://formsubmit.co/ajax/$TARGET" \
+              -H 'Accept: application/json' -H 'Content-Type: application/json' \
+              -H 'Referer: https://luach-sport.github.io/mycar/' -H 'Origin: https://luach-sport.github.io' \
+              -d "$BODY" || true
+            head -c 600 resp.txt; echo
+            break
+          done
