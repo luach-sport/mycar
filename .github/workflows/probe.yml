@@ -12,10 +12,13 @@ jobs:
           for TARGET in i0533101089@gmail.com 52c30c660b806a959f2e968e9e92a9ef; do
             echo "=== target: $TARGET"
             BODY=$(jq -n --arg now "$NOW" '{"_subject":"MyCar – בדיקת מערכת","_captcha":"false","_template":"table","_replyto":"i0533101089@gmail.com","שם השולח":"בדיקה אוטומטית","מייל":"i0533101089@gmail.com","תאריך ושעה":$now,"סוג הפנייה":"בדיקה","הפנייה":"בדיקה שהפניות מהאפליקציה מגיעות למייל"}')
-            curl -sS -m 60 -o resp.txt -w 'HTTP %{http_code} in %{time_total}s\n' -X POST "https://formsubmit.co/ajax/$TARGET" \
+            curl -sS -m 60 -o resp.txt -w 'HTTP %{http_code} in %{time_total}s' -D headers.txt -X POST "https://formsubmit.co/ajax/$TARGET" \
               -H 'Accept: application/json' -H 'Content-Type: application/json' \
               -H 'Referer: https://luach-sport.github.io/mycar/' -H 'Origin: https://luach-sport.github.io' \
-              -d "$BODY" || true
+              -d "$BODY" > timing.txt || true
+            grep -i -E '^(HTTP|location|content-type|server|cf-)' headers.txt | tr '\r\n' '  ' > h.txt; echo "::notice title=headers::$(cat h.txt)"
             head -c 600 resp.txt; echo
+            echo "::notice title=probe::$(head -c 600 resp.txt | tr '\n' ' ')"
+            echo "::notice title=timing::$(cat timing.txt 2>/dev/null)"
             break
           done
