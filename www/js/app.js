@@ -587,6 +587,7 @@
         '<div class="field"><label for="fbe">אימייל *</label><input id="fbe" class="input ltr" style="text-align:left" type="email" inputmode="email" autocomplete="email" data-f="email" value="' + esc(f.email) + '" aria-required="true">' + (e.email ? '<span class="hint bad">' + e.email + '</span>' : '<span class="hint">כדי שנוכל לחזור אליך</span>') + '</div>' +
         '<div class="field"><label for="fbm">מה תרצה להגיד? *</label><textarea id="fbm" class="input" data-f="message" aria-required="true" placeholder="למשל: הייתי רוצה שהאפליקציה תזכיר לי לבדוק לחץ אוויר">' + esc(f.message) + '</textarea>' + (e.message ? '<span class="hint bad">' + e.message + '</span>' : '') + '</div>' +
         '<button type="button" class="btn" data-action="send-feedback">' + icon('message') + 'שליחת הפנייה</button>' +
+        '<button type="button" class="btn ghost" data-action="feedback-mail">או שליחה דרך אפליקציית המייל</button>' +
         (MC.online() ? '' : '<p class="fine" style="margin:0;text-align:center">אין חיבור כרגע. הפנייה תישמר ותישלח לבד כשיחזור האינטרנט.</p>');
       if (box.length) {
         h += '<span class="section-label">הפניות שלי</span>';
@@ -906,11 +907,24 @@
     MC.state.onboarded = true;
     save(true); applyTheme(); closeSheet(); toast('הנתונים שוחזרו'); render();
   };
-  A['send-feedback'] = async () => {
-    const f = ui.form, err = {};
+  function feedbackErrors(f) {
+    const err = {};
     if (String(f.name || '').trim().length < 2) err.name = 'צריך לכתוב שם';
     if (!MC.isEmail(f.email)) err.email = 'צריך אימייל תקין';
     if (String(f.message || '').trim().length < 5) err.message = 'כתוב לפחות כמה מילים';
+    return err;
+  }
+  A['feedback-mail'] = () => {
+    const f = ui.form;
+    f.err = feedbackErrors(f);
+    if (Object.keys(f.err).length) { renderSheet(); return; }
+    const typeLabel = { idea: 'הצעת ייעול', bug: 'תקלה', other: 'פנייה' }[f.type] || 'פנייה';
+    const body = f.message.trim() + '\n\n— ' + f.name.trim() + ' (' + f.email.trim() + ')\nMyCar ' + MC.VERSION.version + ' (' + MC.VERSION.build + ')';
+    MC.state.profile = { name: f.name.trim(), email: f.email.trim() }; save();
+    window.location.href = 'mailto:' + MC.FEEDBACK_TO + '?subject=' + encodeURIComponent('MyCar – ' + typeLabel + ' מ' + f.name.trim()) + '&body=' + encodeURIComponent(body);
+  };
+  A['send-feedback'] = async () => {
+    const f = ui.form, err = feedbackErrors(f);
     f.err = err;
     if (Object.keys(err).length) { renderSheet(); return; }
     MC.state.profile = { name: f.name.trim(), email: f.email.trim() };
