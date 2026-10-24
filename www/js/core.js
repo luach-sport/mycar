@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const MC = (window.MC = window.MC || {});
-  const VER = window.MYCAR_VERSION || { version: '1.02', build: 'dev' };
+  const VER = window.MYCAR_VERSION || { version: '1.03', build: 'dev' };
   MC.VERSION = VER;
   MC.REPO = 'luach-sport/mycar';
   MC.PAGES_URL = 'https://luach-sport.github.io/mycar/';
@@ -10,8 +10,10 @@
     'https://raw.githubusercontent.com/luach-sport/mycar/main/www/data/',
     'https://cdn.jsdelivr.net/gh/luach-sport/mycar@main/www/data/'
   ];
-  // FormSubmit form id (an alias for the developer's inbox), so no e-mail address ships in the app.
-  MC.FEEDBACK_ID = '52c30c660b806a959f2e968e9e92a9ef';
+  // Feedback goes to a small Google Apps Script in the developer's own Google account, which e-mails
+  // only the developer. No e-mail address ships in the app; the key just keeps generic bots out.
+  MC.FEEDBACK_URL = 'https://script.google.com/macros/s/AKfycbwuxeoRQSIFoCfTrJqJ_QUeF1JANm0H4PY5Mc00Ns8hBm9K8lvJ2S5hBYQOVtA3lZX1lw/exec';
+  MC.FEEDBACK_KEY = 'mc_9-ATPT_LPmYj188PGtCksaLh';
 
   // ================= Helpers =================
   const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
@@ -211,7 +213,7 @@
       const webHeaders = Object.assign({}, headers);
       delete webHeaders['User-Agent']; delete webHeaders.Referer; delete webHeaders.Origin;
       const init = { method, headers: webHeaders, signal: ctl ? ctl.signal : undefined };
-      if (opts.data != null) { init.body = JSON.stringify(opts.data); init.headers['Content-Type'] = 'application/json'; }
+      if (opts.data != null) { init.body = JSON.stringify(opts.data); init.headers['Content-Type'] = opts.plain ? 'text/plain;charset=utf-8' : 'application/json'; }
       const res = await fetch(url, init);
       const txt = await res.text();
       let data = txt;

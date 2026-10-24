@@ -1,1 +1,1 @@
-window.MYCAR_VERSION = {"version":"1.02","build":"dev"};
+window.MYCAR_VERSION = {"version":"1.03","build":"dev"};

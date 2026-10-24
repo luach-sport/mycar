@@ -1,6 +1,6 @@
 {
   "name": "mycar",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "MyCar — עד הטיפה האחרונה. מחשבון עלות נסיעה, יומן נסיעות ותדלוקים, עובד גם בלי אינטרנט",
   "scripts": {
