@@ -1,0 +1,18 @@
+name: Feedback probe
+on:
+  push:
+    branches: [claude/feedback-apps-script]
+    paths: ['.github/workflows/probe.yml']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send one test submission the way the app does
+        run: |
+          URL='https://script.google.com/macros/s/AKfycbwuxeoRQSIFoCfTrJqJ_QUeF1JANm0H4PY5Mc00Ns8hBm9K8lvJ2S5hBYQOVtA3lZX1lw/exec'
+          G=$(curl -sS -L -m 60 "$URL" | head -c 200 | tr '\n' ' ')
+          echo "::notice title=get::$G"
+          NOW=$(TZ=Asia/Jerusalem date '+%-d.%-m.%Y %H:%M')
+          BODY=$(jq -cn --arg now "$NOW" '{key:"mc_9-ATPT_LPmYj188PGtCksaLh",name:"בדיקת מערכת",email:"no-reply@example.com",type:"other",message:"בדיקה שהפניות מ-MyCar מגיעות למייל. אפשר למחוק.",when:$now,version:"בדיקה",device:"GitHub"}')
+          P=$(curl -sS -L -m 60 -H 'Content-Type: text/plain;charset=utf-8' --data "$BODY" "$URL" | head -c 200 | tr '\n' ' ')
+          echo "::notice title=post::$P"
