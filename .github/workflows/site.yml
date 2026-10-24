@@ -1,0 +1,67 @@
+name: Website
+
+# The public site (GitHub Pages): user guide, download link and fresh screenshots of the app.
+# Rebuilt when the guide or the app changes, and after every new app release.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'www/**'
+      - 'scripts/site-build.mjs'
+      - '.github/workflows/site.yml'
+  workflow_run:
+    workflows: ['Build APK']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install the screenshot browser
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: |
+          mkdir -p "$RUNNER_TEMP/pw" && cd "$RUNNER_TEMP/pw"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Build the site
+        run: |
+          ln -s "$RUNNER_TEMP/pw/node_modules" node_modules
+          node scripts/site-build.mjs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

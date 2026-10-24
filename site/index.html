@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyCar – עד הטיפה האחרונה</title>
+<meta name="description" content="כמה עולה כל נסיעה בדלק, יומן נסיעות ותדלוקים, וכמה האוטו באמת צורך. מדריך, הורדה וכל הכפתורים.">
+<meta name="theme-color" content="#1652F0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MyCar – עד הטיפה האחרונה">
+<meta property="og:description" content="כמה עולה כל נסיעה בדלק, יומן נסיעות ותדלוקים. להורדה לאנדרואיד, ומדריך לכל הכפתורים.">
+<meta property="og:image" content="https://luach-sport.github.io/mycar/og.jpg">
+<meta property="og:url" content="https://luach-sport.github.io/mycar/">
+<meta property="og:locale" content="he_IL">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&display=swap">
+<style>
+/* Layout: an owner's manual for the app — one column of chapters, each a phone screenshot beside the list of its buttons. Colors and type come from the app itself. */
+:root {
+  --bg: #F3F6FC;
+  --surface: #FFFFFF;
+  --inset: #EAF0FA;
+  --line: #E3E8F2;
+  --ink: #0B1220;
+  --muted: #5B6577;
+  --primary: #1652F0;
+  --primary-text: #1652F0;
+  --primary-soft: #E8EFFF;
+  --on-primary: #FFFFFF;
+  --on-primary-muted: #DCE6FF;
+  --orange: #F55A00;
+  --orange-text: #C2410C;
+  --orange-soft: #FFF1E8;
+  --green-text: #047857;
+  --green-soft: #E7F8F0;
+  --frame: #0B1220;
+  --shadow: 0 18px 40px -18px rgba(22, 82, 240, 0.35);
+  --font: 'Rubik', 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1220; --surface: #141D2E; --inset: #0F1726; --line: #26324A; --ink: #EEF3FB; --muted: #A3AEC2;
+    --primary: #2563EB; --primary-text: #7FA8FF; --primary-soft: #1B2A4A; --on-primary: #FFFFFF; --on-primary-muted: #DCE6FF;
+    --orange: #FF7A2E; --orange-text: #FF8A3D; --orange-soft: #3A2414; --green-text: #34D399; --green-soft: #0F2E25;
+    --frame: #2A3650; --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1220; --surface: #141D2E; --inset: #0F1726; --line: #26324A; --ink: #EEF3FB; --muted: #A3AEC2;
+  --primary: #2563EB; --primary-text: #7FA8FF; --primary-soft: #1B2A4A; --on-primary: #FFFFFF; --on-primary-muted: #DCE6FF;
+  --orange: #FF7A2E; --orange-text: #FF8A3D; --orange-soft: #3A2414; --green-text: #34D399; --green-soft: #0F2E25;
+  --frame: #2A3650; --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  color-scheme: dark;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.page { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; display: flex; flex-direction: column; gap: 56px; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+svg.i.sm { width: 18px; height: 18px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; line-height: 1.15; }
+p { margin: 0; }
+a { color: var(--primary-text); }
+:focus-visible { outline: 3px solid var(--primary-text); outline-offset: 3px; border-radius: 8px; }
+.num { font-variant-numeric: tabular-nums; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+
+/* ---------- Hero ---------- */
+.hero { background: var(--primary); color: var(--on-primary); border-radius: 32px; padding: clamp(22px, 5vw, 44px); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 32px; align-items: center; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; inset: auto -80px -120px auto; width: 320px; height: 320px; border-radius: 50%; background: rgba(255, 255, 255, 0.07); pointer-events: none; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand img { width: 64px; height: 64px; border-radius: 18px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18); }
+.brand h1 { font-size: clamp(38px, 8vw, 60px); font-weight: 900; letter-spacing: -1.5px; direction: ltr; }
+.slogan { display: inline-block; margin-top: 4px; color: #FFD2B3; font-weight: 700; font-size: 18px; }
+.hero-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; position: relative; z-index: 1; }
+.lead { font-size: clamp(17px, 2.4vw, 20px); color: var(--on-primary-muted); max-width: 34ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; }
+.fact { background: rgba(255, 255, 255, 0.14); border-radius: 999px; padding: 5px 12px; font-size: 14px; font-weight: 500; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 22px; border-radius: 18px; font: inherit; font-weight: 700; font-size: 17px; text-decoration: none; cursor: pointer; border: 0; }
+.btn.light { background: #FFFFFF; color: #1652F0; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.35); }
+.btn.ghost { background: rgba(255, 255, 255, 0.14); color: #FFFFFF; font-size: 15px; min-height: 44px; padding: 0 16px; }
+.btn:active { transform: translateY(1px); }
+.gauge { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.gauge svg { width: clamp(150px, 26vw, 220px); height: auto; display: block; }
+.gauge .cap { font-size: 14px; font-weight: 600; color: var(--on-primary-muted); }
+.needle { transform-box: view-box; transform-origin: 60px 62px; transform: rotate(45deg); animation: fill 1.6s cubic-bezier(.2, .8, .2, 1) .2s both; }
+@keyframes fill { from { transform: rotate(-90deg); } to { transform: rotate(45deg); } }
+.arc-fill { stroke-dasharray: 151 151; stroke-dashoffset: 38; animation: arc 1.6s cubic-bezier(.2, .8, .2, 1) .2s both; }
+@keyframes arc { from { stroke-dashoffset: 151; } to { stroke-dashoffset: 38; } }
+@media (prefers-reduced-motion: reduce) { .needle, .arc-fill { animation: none; } }
+
+/* ---------- Tab bar (mirrors the app's bottom tabs) ---------- */
+.tabs-wrap { display: flex; flex-direction: column; gap: 12px; }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); }
+.tabbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 8px; }
+.tabbar a { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 16px; text-decoration: none; color: var(--muted); font-size: 13px; font-weight: 600; text-align: center; }
+.tabbar a:hover { background: var(--primary-soft); color: var(--primary-text); }
+.tabbar .ic { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 32px; border-radius: 12px; }
+.tabbar a:first-child .ic { background: var(--primary-soft); color: var(--primary-text); }
+.jump { display: flex; flex-wrap: wrap; gap: 8px; }
+.jump a { font-size: 14px; font-weight: 600; text-decoration: none; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; }
+.jump a:hover { border-color: var(--primary-text); color: var(--primary-text); }
+
+/* ---------- What's new (from the latest release) ---------- */
+.news { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 20px clamp(18px, 3vw, 28px); display: flex; flex-direction: column; gap: 12px; }
+.news-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.news-head h2 { font-size: 22px; font-weight: 800; }
+.news-head .badge { font-size: 13px; font-weight: 700; color: var(--green-text); background: var(--green-soft); border-radius: 999px; padding: 3px 10px; }
+.news ul { margin: 0; padding: 0 20px 0 0; display: flex; flex-direction: column; gap: 6px; }
+
+/* ---------- Install steps (a real sequence) ---------- */
+.install { display: flex; flex-direction: column; gap: 18px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+.steps li { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 8px; counter-increment: s; min-width: 0; }
+.steps li::before { content: counter(s); width: 34px; height: 34px; border-radius: 12px; background: var(--primary); color: var(--on-primary); font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.steps b { font-size: 17px; }
+.steps p { color: var(--muted); font-size: 15px; }
+.tip { display: flex; gap: 10px; align-items: flex-start; background: var(--orange-soft); color: var(--ink); border-radius: 16px; padding: 12px 14px; font-size: 15px; }
+.tip svg { color: var(--orange-text); margin-top: 2px; }
+
+/* ---------- Chapters ---------- */
+.chapter { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 48px; align-items: start; scroll-margin-top: 16px; }
+.chapter-text { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.chapter-head { display: flex; align-items: center; gap: 14px; }
+.chapter-head .tile { width: 48px; height: 48px; border-radius: 15px; background: var(--primary-soft); color: var(--primary-text); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.chapter-head .tile.orange { background: var(--orange-soft); color: var(--orange-text); }
+.chapter-head .tile.green { background: var(--green-soft); color: var(--green-text); }
+.chapter-head h2 { font-size: clamp(26px, 4.2vw, 34px); font-weight: 800; letter-spacing: -0.5px; }
+.chapter-head .eyebrow { display: block; margin-bottom: 4px; }
+.intro { font-size: 18px; color: var(--muted); max-width: 52ch; }
+
+.keys { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; overflow: hidden; }
+.keys li { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 6px 16px; padding: 14px 18px; align-items: baseline; }
+.keys li + li { border-top: 1px solid var(--line); }
+.key { justify-self: start; font-weight: 700; font-size: 15px; color: var(--primary-text); background: var(--primary-soft); border-radius: 10px; padding: 3px 10px; line-height: 1.5; }
+.key.orange { color: var(--orange-text); background: var(--orange-soft); }
+.what { color: var(--ink); font-size: 15.5px; min-width: 0; }
+.what small { color: var(--muted); font-size: 14px; }
+
+.phones { display: flex; gap: 16px; align-items: flex-start; }
+.phone { width: 260px; max-width: 100%; flex-shrink: 0; background: var(--frame); border-radius: 38px; padding: 8px; box-shadow: var(--shadow); }
+.phone img { display: block; width: 100%; height: auto; aspect-ratio: 720 / 1480; border-radius: 30px; background: var(--inset); }
+.phone figcaption { color: #C9D3E6; font-size: 13px; text-align: center; padding: 8px 4px 4px; }
+.phones.two .phone { width: 220px; }
+
+/* ---------- Updates + feedback ---------- */
+.callout { background: var(--surface); border: 1px solid var(--line); border-radius: 28px; padding: clamp(20px, 4vw, 32px); }
+.ask { background: var(--orange-soft); border-radius: 28px; padding: clamp(20px, 4vw, 32px); }
+.ask .intro { color: var(--ink); }
+.path { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 700; }
+.path .sep { color: var(--muted); font-weight: 400; }
+footer { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; color: var(--muted); font-size: 14px; }
+footer img { width: 40px; height: 40px; border-radius: 12px; }
+footer b { color: var(--ink); direction: ltr; unicode-bidi: isolate; }
+
+@media (max-width: 820px) {
+  .chapter { grid-template-columns: minmax(0, 1fr); }
+  .chapter .phones { order: 2; justify-content: center; }
+  .chapter .chapter-text { display: contents; }
+  .chapter .chapter-head { order: 0; }
+  .chapter .intro { order: 1; }
+  .chapter .keys, .chapter .after { order: 3; }
+  .phones.two { overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 12px; margin-inline: -4px; justify-content: flex-start; }
+  .phones.two .phone { scroll-snap-align: center; width: 230px; }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .gauge { order: -1; align-self: center; }
+  .keys li { grid-template-columns: minmax(0, 1fr); }
+  .tabbar { gap: 2px; padding: 6px; }
+  .tabbar .ic { width: 38px; }
+  .tabbar a { font-size: 12px; padding: 8px 2px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="hero-copy">
+      <div class="brand">
+        <img src="icon.png" alt="">
+        <div>
+          <h1>MyCar</h1>
+          <span class="slogan">עד הטיפה האחרונה</span>
+        </div>
+      </div>
+      <p class="lead">כמה עולה כל נסיעה בדלק, יומן נסיעות ותדלוקים, וכמה האוטו באמת צורך. הכל נשמר רק בטלפון ועובד גם בלי אינטרנט.</p>
+      <div class="facts">
+        <span class="fact">לאנדרואיד</span>
+        <span class="fact">גרסה {{VERSION}}</span>
+        <span class="fact">בלי הרשמה</span>
+        <span class="fact">עובד בלי אינטרנט</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn light" href="https://github.com/luach-sport/mycar/releases/latest/download/mycar.apk" target="_blank" rel="noopener">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+          הורדה לאנדרואיד
+        </a>
+        <button type="button" class="btn ghost" id="copy-link">
+          <svg class="i sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          <span id="copy-label">העתקת קישור ההורדה</span>
+        </button>
+      </div>
+      <input id="apk-url" class="ltr" type="text" readonly value="https://github.com/luach-sport/mycar/releases/latest/download/mycar.apk" aria-label="קישור ההורדה" hidden>
+    </div>
+    <div class="gauge" aria-hidden="true">
+      <svg viewBox="0 0 120 76" direction="ltr" style="direction:ltr">
+        <path d="M12 62 A48 48 0 0 1 108 62" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="10" stroke-linecap="round"/>
+        <path class="arc-fill" d="M12 62 A48 48 0 0 1 108 62" fill="none" stroke="#FF8A3D" stroke-width="10" stroke-linecap="round" pathLength="151"/>
+        <g class="needle"><line x1="60" y1="62" x2="60" y2="27" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"/></g>
+        <circle cx="60" cy="62" r="6.5" fill="#FFFFFF"/>
+        <text x="4" y="75" fill="#DCE6FF" font-size="10" font-weight="700" font-family="Rubik, Arial, sans-serif">E</text>
+        <text x="108" y="75" fill="#DCE6FF" font-size="10" font-weight="700" font-family="Rubik, Arial, sans-serif">F</text>
+      </svg>
+      <span class="cap">מדריך למשתמש</span>
+    </div>
+  </header>
+
+{{WHATS_NEW}}
+  <section class="install" id="install" aria-labelledby="install-h">
+    <div class="chapter-head">
+      <span class="tile"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg></span>
+      <h2 id="install-h">התקנה</h2>
+    </div>
+    <ol class="steps">
+      <li><b>מורידים</b><p>לוחצים "הורדה לאנדרואיד" למעלה. הקובץ mycar.apk יורד לטלפון.</p></li>
+      <li><b>מתקינים</b><p>פותחים את הקובץ מההתראות או מתיקיית ההורדות. בפעם הראשונה מאשרים "התקנה ממקור לא ידוע".</p></li>
+      <li><b>מגדירים רכב</b><p>בפתיחה הראשונה כותבים שם לרכב, נפח מיכל, סוג דלק וסוג רכב, ולוחצים "יאללה, מתחילים".</p></li>
+    </ol>
+    <p class="tip"><svg class="i sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg><span>אם מופיעה אזהרה של Google Play Protect על אפליקציה לא מוכרת, בוחרים להתקין בכל זאת. זה קורה בכל אפליקציה שלא הורדה מחנות Google Play.</span></p>
+  </section>
+
+  <nav class="tabs-wrap" aria-label="המסכים באפליקציה">
+    <span class="eyebrow">בתחתית האפליקציה יש 5 לשוניות</span>
+    <div class="tabbar">
+      <a href="#calc"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg></span>חישוב</a>
+      <a href="#trips"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>נסיעות</a>
+      <a href="#fuel"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 22h12"/><path d="M4 9h10"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg></span>תדלוקים</a>
+      <a href="#stats"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17v-6"/><path d="M13 17V6"/><path d="M18 17v-4"/></svg></span>נתונים</a>
+      <a href="#prefs"><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9"/><path d="M17 6h3"/><circle cx="15" cy="6" r="2"/><path d="M4 12h3"/><path d="M11 12h9"/><circle cx="9" cy="12" r="2"/><path d="M4 18h11"/><circle cx="17" cy="18" r="2"/></svg></span>הגדרות</a>
+    </div>
+    <div class="jump">
+      <a href="#result">מסך התוצאה</a>
+      <a href="#updates">עדכונים</a>
+      <a href="#feedback">איך שולחים הערות</a>
+    </div>
+  </nav>
+
+  <!-- 1. Calculator -->
+  <section class="chapter" id="calc" aria-labelledby="calc-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg></span>
+        <div><span class="eyebrow">לשונית 1 מתוך 5</span><h2 id="calc-h">חישוב</h2></div>
+      </div>
+      <p class="intro">המסך הראשי. בוחרים מאיפה ולאן, והאפליקציה מחשבת כמה הנסיעה תעלה בדלק.</p>
+      <ul class="keys">
+        <li><span class="key">נקודת מוצא ויעד</span><span class="what">בוחרים עיר, יישוב או כתובת. יישובים נמצאים גם בלי אינטרנט, וכתובת מדויקת צריכה אינטרנט.</span></li>
+        <li><span class="key">כפתור המיקום</span><span class="what">המקום שבו אתם נמצאים עכשיו נכנס כנקודת המוצא. עובד עם GPS, גם בלי אינטרנט.</span></li>
+        <li><span class="key">כפתור החיצים</span><span class="what">מחליף בין המוצא ליעד.</span></li>
+        <li><span class="key">כפתור הרכב</span><span class="what">למעלה בצד. בוחרים רכב, אם הגדרתם יותר מאחד.</span></li>
+        <li><span class="key">מסלולים שמורים</span><span class="what">לחיצה על מסלול ממלאת אותו מיד. "+ שמור מסלול" שומר את המסלול שבחרתם.</span></li>
+        <li><span class="key">מרחק ידני</span><span class="what">כותבים כמה ק״מ בעצמכם, במקום לבחור מקומות.</span></li>
+        <li><span class="key">הלוך-חזור</span><span class="what">מכפיל את המרחק ואת העלות.</span></li>
+        <li><span class="key">חלוקה בין נוסעים</span><span class="what">עם + ו־− קובעים כמה נוסעים, ורואים כמה משלם כל אחד.</span></li>
+        <li><span class="key">מחיר דלק</span><span class="what">אוטומטי (המחיר המפוקח, מתעדכן לבד), תדלוק אחרון, או מחיר שאתם כותבים. אפשר להוסיף תוספת של שירות מלא.</span></li>
+        <li><span class="key orange">חשב עלות נסיעה</span><span class="what">מציג את התוצאה.</span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/calc.jpg" alt="מסך החישוב: חדרה לירושלים, מסלולים שמורים, 3 נוסעים ומחיר דלק 8.27 ₪" width="720" height="1480"></figure>
+    </div>
+  </section>
+
+  <!-- Result -->
+  <section class="chapter" id="result" aria-labelledby="result-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile orange"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></span>
+        <div><span class="eyebrow">אחרי "חשב עלות נסיעה"</span><h2 id="result-h">מסך התוצאה</h2></div>
+      </div>
+      <p class="intro">כאן רואים כמה הנסיעה עולה, ומאיפה המספר מגיע.</p>
+      <ul class="keys">
+        <li><span class="key">הסכום הגדול</span><span class="what">עלות הדלק המשוערת בשקלים.</span></li>
+        <li><span class="key">המחוג</span><span class="what">איזה חלק מהמיכל הנסיעה לוקחת.</span></li>
+        <li><span class="key">ק״מ, ליטר, שעות</span><span class="what">אורך הנסיעה, כמה דלק היא צורכת וכמה זמן היא לוקחת.</span></li>
+        <li><span class="key">פירוט המסלול</span><span class="what">כמה מהדרך בעיר וכמה בין-עירונית. מזיזים את הפס כדי לשנות את החלוקה, והמחיר מתעדכן מיד.</span></li>
+        <li><span class="key">כיוון אחד ולכל נוסע</span><span class="what">המחיר לכיוון אחד או הלוך-חזור, וכמה משלם כל נוסע.</span></li>
+        <li><span class="key">עבודה / פרטי</span><span class="what">מסמנים את סוג הנסיעה, כדי לראות אחר כך כמה הוצאתם על כל סוג.</span></li>
+        <li><span class="key">שמור לנסיעות</span><span class="what">הנסיעה נכנסת ליומן הנסיעות.</span></li>
+        <li><span class="key">נווט בווייז</span><span class="what">פותח את וייז עם היעד.</span></li>
+        <li><span class="key orange">שיתוף</span><span class="what">הכפתור למעלה. שולחים את התוצאה כתמונה של המסך או כטקסט, למשל בוואטסאפ.</span></li>
+      </ul>
+    </div>
+    <div class="phones two">
+      <figure class="phone" style="margin:0"><img src="shots/result.jpg" alt="מסך התוצאה: 99.86 ₪, 218 ק״מ, 12.1 ליטר, 33.29 ₪ לכל נוסע" width="720" height="1480" loading="lazy"><figcaption>התוצאה</figcaption></figure>
+      <figure class="phone" style="margin:0"><img src="shots/share.jpg" alt="חלון השיתוף: שיתוף כתמונה או כטקסט" width="720" height="1480" loading="lazy"><figcaption>שיתוף כתמונה או כטקסט</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 2. Trips -->
+  <section class="chapter" id="trips" aria-labelledby="trips-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <div><span class="eyebrow">לשונית 2 מתוך 5</span><h2 id="trips-h">נסיעות</h2></div>
+      </div>
+      <p class="intro">היומן של כל הנסיעות ששמרתם, מסודר לפי ימים.</p>
+      <ul class="keys">
+        <li><span class="key">החיצים ליד החודש</span><span class="what">עוברים בין חודשים.</span></li>
+        <li><span class="key">הסיכום הכחול</span><span class="what">כמה נסיעות, כמה ק״מ וכמה שקלים בחודש.</span></li>
+        <li><span class="key">הכל / עבודה / פרטי</span><span class="what">מסננים את הרשימה לפי סוג הנסיעה.</span></li>
+        <li><span class="key">ייצוא לאקסל</span><span class="what">קובץ עם כל הנסיעות, לפתיחה באקסל או בגוגל שיטס.</span></li>
+        <li><span class="key">לחיצה על נסיעה</span><span class="what">פותחת את הפרטים. משם אפשר לשנות את סוג הנסיעה, לחשב אותה שוב, לשתף או למחוק.</span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/trips.jpg" alt="יומן הנסיעות של אוקטובר: 8 נסיעות, 666 ק״מ, 351 ₪" width="720" height="1480" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- 3. Fuel -->
+  <section class="chapter" id="fuel" aria-labelledby="fuel-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile orange"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 22h12"/><path d="M4 9h10"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg></span>
+        <div><span class="eyebrow">לשונית 3 מתוך 5</span><h2 id="fuel-h">תדלוקים</h2></div>
+      </div>
+      <p class="intro">רושמים כאן כל תדלוק, והאפליקציה לומדת כמה הרכב שלכם צורך באמת.</p>
+      <ul class="keys">
+        <li><span class="key orange">תדלוק חדש</span><span class="what">הכפתור הכתום. כותבים כמה שילמתם (או כמה ליטרים), את הקילומטרז׳ מלוח השעונים, והאם מילאתם מיכל מלא.</span></li>
+        <li><span class="key">הצריכה האמיתית</span><span class="what">מהתדלוק המלא השני: כמה ק״מ לליטר הרכב עושה, כמה נסעתם בין תדלוקים, וכמה עולה כל קילומטר.</span></li>
+        <li><span class="key">לעדכן</span><span class="what">אם הצריכה האמיתית שונה ממה שהוגדר לרכב, מתקנים בלחיצה אחת.</span></li>
+        <li><span class="key">צריכה לפי תדלוק</span><span class="what">גרף שמראה איך הצריכה משתנה מתדלוק לתדלוק.</span></li>
+        <li><span class="key">לחיצה על תדלוק</span><span class="what">עריכה או מחיקה.</span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/fuel.jpg" alt="יומן התדלוקים: צריכה אמיתית 16.3 ק״מ לליטר, עלות 0.51 ₪ לקילומטר" width="720" height="1480" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- 4. Stats -->
+  <section class="chapter" id="stats" aria-labelledby="stats-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile green"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17v-6"/><path d="M13 17V6"/><path d="M18 17v-4"/></svg></span>
+        <div><span class="eyebrow">לשונית 4 מתוך 5</span><h2 id="stats-h">נתונים</h2></div>
+      </div>
+      <p class="intro">התמונה הגדולה: כמה הרכב עולה לכם.</p>
+      <ul class="keys">
+        <li><span class="key">חודש / שנה</span><span class="what">בוחרים על איזו תקופה להסתכל, ועוברים ביניהן עם החיצים.</span></li>
+        <li><span class="key">ארבעת המספרים</span><span class="what">הוצאה על דלק, קילומטרים, צריכה ממוצעת ועלות לקילומטר.</span></li>
+        <li><span class="key">הוצאה חודשית על דלק</span><span class="what">גרף של ההוצאה בכל חודש.</span></li>
+        <li><span class="key">עבודה מול פרטי</span><span class="what">כמה נסעתם והוצאתם על כל סוג נסיעה.</span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/stats.jpg" alt="מסך הנתונים: 550 ₪ על דלק באוקטובר, 1,102 ק״מ, 16.4 ק״מ לליטר" width="720" height="1480" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- 5. Settings -->
+  <section class="chapter" id="prefs" aria-labelledby="prefs-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9"/><path d="M17 6h3"/><circle cx="15" cy="6" r="2"/><path d="M4 12h3"/><path d="M11 12h9"/><circle cx="9" cy="12" r="2"/><path d="M4 18h11"/><circle cx="17" cy="18" r="2"/></svg></span>
+        <div><span class="eyebrow">לשונית 5 מתוך 5</span><h2 id="prefs-h">הגדרות</h2></div>
+      </div>
+      <p class="intro">הרכב, המחיר, המראה, וכל השאר.</p>
+      <ul class="keys">
+        <li><span class="key">הרכב שלי</span><span class="what">העיפרון פותח עריכה: שם, צריכה בעיר ובין-עירונית, נפח מיכל וסוג דלק. "+ הוסף רכב נוסף" למי שיש יותר מרכב אחד.</span></li>
+        <li><span class="key">ללמוד מהתדלוקים</span><span class="what">כשזה דלוק, החישוב מתאים את עצמו לצריכה האמיתית של הרכב.</span></li>
+        <li><span class="key">מחיר דלק</span><span class="what">אוטומטי, תדלוק אחרון או ידני, ותוספת לתדלוק בשירות מלא.</span></li>
+        <li><span class="key">מראה</span><span class="what">בהיר, כהה, או לפי הגדרת הטלפון.</span></li>
+        <li><span class="key">מקומות ומסלולים שמורים</span><span class="what">בית, עבודה וכל מקום שחוזרים אליו.</span></li>
+        <li><span class="key">תזכורות</span><span class="what">טסט, ביטוח וטיפול (לפי קילומטרים). מגיעה התראה לטלפון.</span></li>
+        <li><span class="key">נתונים במכשיר</span><span class="what">מה שמור בטלפון לשימוש בלי אינטרנט, ו"עדכן עכשיו".</span></li>
+        <li><span class="key">גיבוי ושחזור</span><span class="what">שומרים גיבוי לקובץ (למשל בדרייב או בוואטסאפ לעצמכם), משחזרים ממנו, או מייצאים לאקסל.</span></li>
+        <li><span class="key">פנייה / הצעת ייעול</span><span class="what">שולחים הערה למפתח. <a href="#feedback">איך זה עובד</a></span></li>
+        <li><span class="key">אודות</span><span class="what">הגרסה, "בדיקת עדכונים", ו"שיתוף האפליקציה עם חברים" ששולח את קישור ההורדה.</span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/settings.jpg" alt="מסך ההגדרות: הרכב שלי, צריכה 12.0 בעיר ו-17.0 בין-עירוני, מחיר דלק אוטומטי" width="720" height="1480" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- Updates -->
+  <section class="chapter callout" id="updates" aria-labelledby="updates-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile green"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg></span>
+        <h2 id="updates-h">עדכונים</h2>
+      </div>
+      <p class="intro">כשיוצאת גרסה חדשה, בפתיחת האפליקציה קופץ חלון "גרסה חדשה" עם רשימה של מה השתנה.</p>
+      <ul class="keys">
+        <li><span class="key">עדכון עכשיו</span><span class="what">האפליקציה מורידה את העדכון ונפתחת מחדש בגרסה החדשה. לא צריך להוריד קובץ, וכל הנתונים נשמרים.</span></li>
+        <li><span class="key">אחר כך</span><span class="what">סוגר את החלון. אפשר לעדכן מתי שרוצים.</span></li>
+        <li><span class="key">בדיקת עדכונים</span><span class="what"><span class="path">הגדרות <span class="sep">←</span> אודות <span class="sep">←</span> בדיקת עדכונים</span><br><small>אם רוצים לבדוק בעצמכם.</small></span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/update.jpg" alt="חלון גרסה חדשה עם כפתור עדכון עכשיו" width="720" height="1480" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- Feedback -->
+  <section class="chapter ask" id="feedback" aria-labelledby="feedback-h">
+    <div class="chapter-text">
+      <div class="chapter-head">
+        <span class="tile orange"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/><path d="M8 9h8M8 13h5"/></svg></span>
+        <h2 id="feedback-h">מה מבקשים מכם</h2>
+      </div>
+      <p class="intro">להשתמש באפליקציה כרגיל, ולספר לנו מה לא עבד, מה לא היה ברור, ומה חסר לכם.</p>
+      <ul class="keys">
+        <li><span class="key">איפה</span><span class="what"><span class="path">הגדרות <span class="sep">←</span> פנייה / הצעת ייעול</span></span></li>
+        <li><span class="key">מה ממלאים</span><span class="what">סוג (הצעת ייעול, תקלה או אחר), שם, מייל, ומה רציתם להגיד.</span></li>
+        <li><span class="key orange">שליחת הפנייה</span><span class="what">הפנייה מגיעה ישר למפתח. אם אין אינטרנט, היא נשמרת ונשלחת לבד כשהחיבור חוזר.</span></li>
+        <li><span class="key">טיפ לתקלות</span><span class="what">כתבו מה לחצתם, מה ציפיתם שיקרה ומה קרה בפועל. ככה הרבה יותר קל לתקן.</span></li>
+      </ul>
+    </div>
+    <div class="phones">
+      <figure class="phone" style="margin:0"><img src="shots/feedback.jpg" alt="טופס פנייה / הצעת ייעול ממולא לדוגמה" width="720" height="1480" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <footer>
+    <img src="icon.png" alt="">
+    <span><b>MyCar</b> · עד הטיפה האחרונה · פותח על ידי <b>Itzko</b></span>
+    <span>גרסה {{VERSION}} (בנייה {{BUILD}}) · עודכן {{DATE}}</span>
+    <span>הנתונים בצילומי המסך הם לדוגמה. מחירים ומרחקים באפליקציה הם הערכה.</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-link');
+  var label = document.getElementById('copy-label');
+  var input = document.getElementById('apk-url');
+  var url = input.value;
+  function done(text) {
+    label.textContent = text;
+    setTimeout(function () { label.textContent = 'העתקת קישור ההורדה'; }, 2200);
+  }
+  btn.addEventListener('click', function () {
+    var fallback = function () {
+      input.hidden = false;
+      input.style.width = '100%';
+      input.style.borderRadius = '12px';
+      input.style.border = '0';
+      input.style.padding = '10px 12px';
+      input.style.font = 'inherit';
+      input.focus();
+      input.select();
+      done('סמנו והעתיקו את הקישור');
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { done('הקישור הועתק'); }, fallback);
+      } else { fallback(); }
+    } catch (e) { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>

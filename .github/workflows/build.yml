@@ -5,13 +5,15 @@ on:
     branches: [main]
     paths-ignore:
       - 'README.md'
+      - 'CLAUDE.md'
       - 'update.json'
+      - 'site/**'
+      - 'scripts/site-build.mjs'
+      - '.github/workflows/site.yml'
   workflow_dispatch:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: build-${{ github.ref }}
@@ -70,11 +72,6 @@ jobs:
 
       - name: Prepare web app (runtime, version)
         run: node scripts/prepare-web.mjs
-
-      - name: Upload web version for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: www
 
       - name: Create Android project
         run: npx cap add android
@@ -170,14 +167,3 @@ jobs:
         run: |
           echo "::error::Test build passed, but the APK was not published: add the secret MYCAR_KEY_PASS"
           exit 1
-
-  pages:
-    needs: apk
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
