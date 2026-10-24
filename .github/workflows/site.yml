@@ -54,6 +54,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "${GITHUB_RUN_ID}" > _site/build.txt
           cd _site
           git init -q -b gh-pages
           git config user.name "github-actions[bot]"
@@ -65,13 +66,11 @@ jobs:
       - name: Check the live site
         continue-on-error: true
         run: |
-          V=$(grep -o 'גרסה [0-9.]*' _site/index.html | head -1)
-          for i in $(seq 1 18); do
+          for i in $(seq 1 30); do
             sleep 10
-            LIVE=$(curl -sfL "https://luach-sport.github.io/mycar/?t=$(date +%s)" | grep -o 'גרסה [0-9.]*' | head -1 || true)
-            if [ -n "$LIVE" ]; then break; fi
+            LIVE=$(curl -sf "https://luach-sport.github.io/mycar/build.txt?t=$(date +%s)" || true)
+            [ "$LIVE" = "${GITHUB_RUN_ID}" ] && break
           done
-          OG=$(curl -s -o /dev/null -w '%{http_code}' https://luach-sport.github.io/mycar/og.jpg)
-          SHOT=$(curl -s -o /dev/null -w '%{http_code}' https://luach-sport.github.io/mycar/shots/result.jpg)
-          APP=$(curl -s -o /dev/null -w '%{http_code}' https://luach-sport.github.io/mycar/app/)
-          echo "::notice title=live::built=[$V] live=[$LIVE] og=$OG shot=$SHOT app=$APP"
+          B=https://luach-sport.github.io/mycar
+          code() { curl -s -o /dev/null -w '%{http_code}' "$1"; }
+          echo "::notice title=live::updated=$([ "$LIVE" = "${GITHUB_RUN_ID}" ] && echo yes || echo no) page=$(code $B/) og=$(code $B/og.jpg) shot=$(code $B/shots/result.jpg) app=$(code $B/app/) version=[$(curl -s $B/ | grep -o 'גרסה [0-9.]*' | head -1)]"
