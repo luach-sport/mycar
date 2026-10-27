@@ -1,0 +1,20 @@
+{
+  "id": "mycar",
+  "title": "MyCar – עד הטיפה האחרונה",
+  "description": "כמה עולה כל נסיעה בדלק, יומן נסיעות ותדלוקים, וכמה האוטו באמת צורך. עובד בלי אינטרנט. מדריך לכל הכפתורים והורדה לאנדרואיד. פותח על ידי Itzko.",
+  "themeColor": "#1652F0",
+  "icon": "www/icon-512.png",
+  "fonts": "www/fonts",
+  "appDir": "www",
+  "versionFile": "js/version.js",
+  "versionGlobal": "MYCAR_VERSION",
+  "shots": "scripts/site/scenes.mjs",
+  "css": ["brand.css"],
+  "creditText": "MyCar היא אפליקציה עצמאית של Itzko: בלי פרסומות, בלי הרשמה, והנתונים שלכם נשארים אצלכם בטלפון. כל רעיון או תקלה מגיעים ישירות אליו דרך \"פנייה / הצעת ייעול\" בהגדרות של האפליקציה.",
+  "footerNote": "הנתונים בצילומי המסך הם לדוגמה. מחירים ומרחקים באפליקציה הם הערכה.",
+  "parts": [
+    "hero", "WHATS_NEW", "offline", "install", "tabs",
+    "ch-calc", "ch-result", "ch-trips", "ch-fuel", "ch-stats", "ch-prefs", "ch-share",
+    "ch-updates", "ch-feedback", "kit:share-band", "kit:credit", "kit:footer"
+  ]
+}

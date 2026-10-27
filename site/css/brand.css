@@ -1,0 +1,49 @@
+/* MyCar's colours and font on top of the shared Itzko kit: blue like the app, with orange for actions. */
+@font-face {
+  font-family: 'Rubik';
+  src: url('../fonts/Rubik-var.ttf') format('truetype');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+:root {
+  --bg: #F3F6FC;
+  --inset: #EAF0FA;
+  --line: #E3E8F2;
+  --ink: #0B1220;
+  --muted: #5B6577;
+  --primary: #1652F0;
+  --primary-text: #1652F0;
+  --primary-soft: #E8EFFF;
+  --on-primary: #FFFFFF;
+  --hero: #1652F0;
+  --hero-ink: #FFFFFF;
+  --hero-muted: #DCE6FF;
+  --hero-btn-ink: #1652F0;
+  --orange-text: #C2410C;
+  --orange-soft: #FFF1E8;
+  --maker-accent: #1652F0;
+  --credit-accent: #FF8A3D;
+  --credit-mono: #1652F0;
+  --credit-mono-ink: #FFFFFF;
+  --credit-glow: rgba(22, 82, 240, 0.25);
+  --frame: #0B1220;
+  --shadow: 0 18px 40px -18px rgba(22, 82, 240, 0.35);
+  --font: 'Rubik', 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1220; --surface: #141D2E; --inset: #0F1726; --line: #26324A; --ink: #EEF3FB; --muted: #A3AEC2;
+    --primary: #2563EB; --primary-text: #7FA8FF; --primary-soft: #1B2A4A; --hero: #1B47C9;
+    --orange-text: #FF8A3D; --orange-soft: #3A2414; --frame: #2A3650; --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1220; --surface: #141D2E; --inset: #0F1726; --line: #26324A; --ink: #EEF3FB; --muted: #A3AEC2;
+  --primary: #2563EB; --primary-text: #7FA8FF; --primary-soft: #1B2A4A; --hero: #1B47C9;
+  --orange-text: #FF8A3D; --orange-soft: #3A2414; --frame: #2A3650; --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+}
+.brand h1.ltr-name { direction: ltr; }
+.chapter-head .tile.orange { background: var(--orange-soft); color: var(--orange-text); }
+.key.orange { color: var(--orange-text); background: var(--orange-soft); }
+.ask { background: var(--orange-soft); }

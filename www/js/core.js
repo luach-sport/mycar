@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const MC = (window.MC = window.MC || {});
-  const VER = window.MYCAR_VERSION || { version: '1.03', build: 'dev' };
+  const VER = window.MYCAR_VERSION || { version: '1.04', build: 'dev' };
   MC.VERSION = VER;
   MC.REPO = 'luach-sport/mycar';
   MC.PAGES_URL = 'https://luach-sport.github.io/mycar/';

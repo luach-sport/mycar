@@ -871,7 +871,7 @@
       if (ui.sheet && ui.sheet.name === 'share') renderSheet();
     } finally { ui.snapping = false; }
   };
-  A['share-app'] = () => shareText('MyCar – עד הטיפה האחרונה\nכמה עולה כל נסיעה, יומן נסיעות ותדלוקים, עובד גם בלי אינטרנט.\n\nלהורדה לאנדרואיד:\n' + MC.APK_URL);
+  // A['share-app'] (link to the site or the APK file) lives in share-app.js.
   A['check-update'] = async () => {
     const i = await MC.update.check(true);
     if (i) openSheet('update'); else toast(MC.update.error || 'יש לך את הגרסה האחרונה');
@@ -1160,6 +1160,8 @@
 
   // Small test surface for automated checks.
   window.__mycar = { normalize, A, get ui() { return ui; }, render, openSheet, closeSheet, flushOutbox };
+  // For the small feature files loaded after this one (share-app.js): add sheets and buttons.
+  Object.assign(MC, { SHEETS, A, openSheet, closeSheet, renderSheet });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
