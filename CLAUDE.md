@@ -10,4 +10,4 @@
 - **שיתוף האפליקציה** (`www/js/share-app.js`, נטען אחרי `app.js`): קישור לאתר עם הודעה קצרה, או קובץ ה-APK המותקן (נמצא דרך `/proc/self/maps`, ואם לא, יורד מ-GitHub). בדיקה: `tests/share-app.test.mjs`.
 - **מה חדש**: לפני כל גרסה כותבים את השינויים ב-`release-notes.txt` (שורה לכל שינוי, בשפה פשוטה). זה מוצג בחלון "גרסה חדשה" באפליקציה ובאתר.
 - מספר גרסה: `APP_VERSION` ב-`.github/workflows/build.yml` (ובברירות המחדל ב-`scripts/prepare-web.mjs`, `scripts/make-update.mjs`, `www/js/core.js`).
-- פניות מהאפליקציה נשלחות לסקריפט Google Apps Script של המפתח (`feedback/Code.gs`, הכתובת ב-`MC.FEEDBACK_URL`). כתובת המייל של המפתח לא נכנסת לקוד.
+- פניות מהאפליקציה נשלחות לסקריפט Google Apps Script של המפתח (`feedback/`: קובץ לכל חלק – `Settings`, `Main`, `Message`, `Email`, `Limits`, `Helpers`; אותו סקריפט משרת גם את שמרתי. הכתובת ב-`MC.FEEDBACK_URL`). כתובת המייל של המפתח לא נכנסת לקוד.
