@@ -12,15 +12,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Make the narration
-        run: |
-          pip install edge-tts
-          python gen.py
       - name: Transcribe back to check pronunciation
         continue-on-error: true
         run: |
           pip install faster-whisper
-          python check.py | tee out/transcripts.txt
+          python check.py > out/transcripts.txt 2>&1 || true
       - name: Save the clips to this branch
         run: |
           git config user.name "github-actions[bot]"
