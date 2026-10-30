@@ -1,0 +1,27 @@
+name: Promo voice
+on:
+  push:
+    branches: [promo-voice]
+permissions:
+  contents: read
+jobs:
+  voice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Make the narration
+        run: |
+          pip install edge-tts
+          python gen.py
+      - name: Transcribe back to check pronunciation
+        continue-on-error: true
+        run: |
+          pip install faster-whisper
+          python check.py | tee out/transcripts.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voice
+          path: out/
