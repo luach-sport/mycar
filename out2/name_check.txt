@@ -1,0 +1,9 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+out/avri_l5n.mp3 en | Maikao
+out/avri_l5n.mp3 auto(es) | Maikao.
+out/avri_l5.mp3 en | My car.
+out/avri_l5.mp3 auto(pt) | Mãe cara.
+out2/l5_v1.mp3 en | Michael
+out2/l5_v1.mp3 auto(en) | Michael
+out/avri_l3n.mp3 en | Maikar Machado.
+out/avri_l3n.mp3 auto(he) | מעיקר מחפש.
