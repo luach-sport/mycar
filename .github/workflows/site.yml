@@ -52,6 +52,8 @@ jobs:
           npx playwright install --with-deps chromium
 
       - name: Build the site
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # download counts from the releases
         run: |
           ln -s "$RUNNER_TEMP/pw/node_modules" node_modules
           node .kit/kit/lib/build.mjs
