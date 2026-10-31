@@ -66,5 +66,9 @@ text(join(RES, 'drawable', 'ic_stat_mycar.xml'), `<?xml version="1.0" encoding="
 await png(iconSvg({ size: 192, shape: 'square', scale: 0.76 }), join(ROOT, 'www', 'icon.png'));
 await png(iconSvg({ size: 512, shape: 'square', scale: 0.76 }), join(ROOT, 'www', 'icon-512.png'));
 await png(iconSvg({ size: 1024, shape: 'square', scale: 0.76 }), join(ROOT, 'assets', 'icon-1024.png'));
+// iPhone home screen (iOS rounds the corners itself, so the blue fills the whole square) and the web app's
+// "maskable" icon (Android crops it to its own shape; the drop stays inside the safe middle).
+await png(iconSvg({ size: 180, shape: 'full', scale: 0.72 }), join(ROOT, 'www', 'icon-180.png'));
+await png(iconSvg({ size: 512, shape: 'full', scale: 0.6 }), join(ROOT, 'www', 'icon-maskable-512.png'));
 writeFileSync(join(ROOT, 'www', 'logo.svg'), iconSvg({ size: 256, shape: 'square', scale: 0.76 }));
 console.log('icons done');

@@ -47,3 +47,21 @@
 .chapter-head .tile.orange { background: var(--orange-soft); color: var(--orange-text); }
 .key.orange { color: var(--orange-text); background: var(--orange-soft); }
 .ask { background: var(--orange-soft); }
+
+/* iPhone: the button under "download for Android", and the install section with the QR code. */
+.iphone-cta { align-self: flex-start; }
+.btn.primary { background: var(--primary); color: var(--on-primary); box-shadow: var(--shadow); }
+.iphone-open { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px 28px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 20px clamp(18px, 3vw, 28px); }
+.iphone-open-text { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
+.iphone-open-text p { color: var(--muted); font-size: 15px; margin: 0; }
+.iphone-open .link-line { font-weight: 700; color: var(--primary-text); font-size: 15px; }
+.qr-box { background: #FFFFFF; border-radius: 18px; padding: 8px; width: 150px; box-shadow: 0 0 0 1px var(--line); }
+.qr-code { display: block; width: 100%; height: auto; }
+.steps.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.iphone-diff { margin: 0; padding: 0 20px 0 0; display: flex; flex-direction: column; gap: 6px; font-size: 15px; color: var(--muted); }
+.iphone-diff b { color: var(--ink); }
+@media (max-width: 560px) {
+  .iphone-open { grid-template-columns: minmax(0, 1fr); }
+  .qr-box { display: none; }
+  .steps.four { grid-template-columns: minmax(0, 1fr); }
+}

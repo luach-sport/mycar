@@ -98,13 +98,8 @@
     }
     const blob = await (await fetch(dataUrl)).blob();
     const file = new File([blob], name, { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try { await navigator.share({ files: [file], title }); } catch (e) { /* cancelled */ }
-      return true;
-    }
-    const a = document.createElement('a');
-    a.href = dataUrl; a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
+    // iPhone and browsers: web-share.js (asks for one more tap if the picture took a moment to prepare).
+    await MC.webShare({ files: [file], title, preview: dataUrl });
     return true;
   };
 })();

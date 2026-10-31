@@ -48,7 +48,8 @@ export const SCENES = [
   scene('settings', tab('settings')),
   scene('feedback', tab('settings') + " window.MC.state.profile = { name: 'דני כהן', email: 'dani@example.com' }; m.openSheet('feedback');",
     { fill: ['#fbm', 'הייתי רוצה תזכורת לבדוק לחץ אוויר בצמיגים'], wait: 600 }),
-  scene('share-app', tab('settings') + " m.openSheet('shareApp');", { wait: 700 }),
+  // As on an Android phone (the site describes both buttons; on iPhone only the link is offered).
+  scene('share-app', tab('settings') + " const n = window.MC.isNative; window.MC.isNative = () => true; m.openSheet('shareApp'); window.MC.isNative = n;", { wait: 700 }),
   scene('update', tab('settings') + `
     const b = parseInt(arg.info.build, 10) || 1;
     window.MC.VERSION.build = String(b - 1 > 0 ? b - 1 : b);

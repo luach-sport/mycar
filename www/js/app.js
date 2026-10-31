@@ -533,7 +533,7 @@
         '<div class="grid2"><div class="field"><label for="re">כל כמה ק״מ</label><input id="re" class="input num" inputmode="numeric" data-f="every" value="' + esc(f.every) + '"></div>' +
         '<div class="field"><label for="rl">קילומטרז׳ בטיפול האחרון</label><input id="rl" class="input num" inputmode="numeric" data-f="lastKm" value="' + esc(f.lastKm) + '"></div></div>' +
         '<span class="hint" style="font-size:12px;color:var(--muted)">' + (a.lastOdo ? 'הקילומטרז׳ האחרון שנרשם בתדלוק: ' + fmt(a.lastOdo) : 'התזכורת מחושבת לפי הקילומטרז׳ שרושמים בתדלוקים.') + '</span></div>' +
-        '<p class="fine" style="margin:0 4px">על טסט וביטוח תגיע התראה שבועיים לפני ויום לפני, בשעה 9:00.</p>' +
+        '<p class="fine" style="margin:0 4px">' + (MC.isNative() ? 'על טסט וביטוח תגיע התראה שבועיים לפני ויום לפני, בשעה 9:00.' : 'שבועיים לפני הטסט או הביטוח תופיע תזכורת במסך החישוב, בכל פעם שפותחים את MyCar.') + '</p>' +
         '<button type="button" class="btn" data-action="save-reminders">' + icon('check') + 'שמור תזכורות</button>';
     }
   };
@@ -620,6 +620,7 @@
   };
   function updateBlock() {
     const U = MC.update;
+    if (!MC.isNative()) return '<p class="fine" style="margin:0;text-align:center">העדכונים נכנסים לבד: כשיש אינטרנט, גרסה חדשה יורדת ברקע ונפתחת בפעם הבאה שחוזרים לאפליקציה.</p>';
     if (!MC.canSelfUpdate()) return '';
     if (U.info) return '<button type="button" class="notice blue" style="border:0;text-align:right" data-action="open-sheet" data-sheet="update">' + icon('sparkle', 'sm') + '<span class="grow">יש גרסה חדשה: ' + esc(U.info.version) + ' (בנייה ' + U.info.build + ')</span><span style="font-weight:700">לעדכון</span></button>';
     return '<button type="button" class="btn secondary" data-action="check-update"' + (U.state === 'checking' ? ' aria-disabled="true"' : '') + '>' + icon('refresh') + (U.state === 'checking' ? 'בודק…' : 'בדיקת עדכונים') + '</button>';
@@ -678,7 +679,7 @@
           key: MC.FEEDBACK_KEY, name: m.name, email: m.email, type: m.type, message: m.message,
           when: MC.dateFull(m.ts) + ' ' + MC.time(m.ts),
           version: MC.VERSION.version + ' (בנייה ' + MC.VERSION.build + ')',
-          device: MC.isNative() ? 'אנדרואיד' : 'דפדפן'
+          device: MC.deviceName ? MC.deviceName() : MC.isNative() ? 'אנדרואיד' : 'דפדפן'
         };
         m.tries = (m.tries || 0) + 1;
         try {
@@ -720,12 +721,8 @@
       }
       return false;
     }
-    const blob = new Blob([content], { type: mime });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    return true;
+    const files = (Array.isArray(name) ? name : [{ name, content, mime }]).map((f) => new File([f.content], f.name, { type: f.mime }));
+    return (await MC.webShare({ files, title })) !== 'cancelled';
   }
   async function shareText(text) {
     if (MC.isNative()) { try { await MC.callRaw('Share', 'share', { text, dialogTitle: 'שיתוף' }); return; } catch (e) { /* cancelled */ } return; }
@@ -746,8 +743,12 @@
       });
     });
     const stamp = MC.dateInput(Date.now());
-    const ok1 = await shareFile('MyCar-נסיעות-' + stamp + '.csv', csv(trips), 'text/csv', 'ייצוא נסיעות');
-    if (ok1) await shareFile('MyCar-תדלוקים-' + stamp + '.csv', csv(fuelRows), 'text/csv', 'ייצוא תדלוקים');
+    const tripsFile = { name: 'MyCar-נסיעות-' + stamp + '.csv', content: csv(trips), mime: 'text/csv' };
+    const fuelFile = { name: 'MyCar-תדלוקים-' + stamp + '.csv', content: csv(fuelRows), mime: 'text/csv' };
+    // On iPhone and in a browser both files go out together: a second share needs a second tap there.
+    if (!MC.isNative()) { await shareFile([tripsFile, fuelFile], null, null, 'ייצוא לאקסל'); return; }
+    const ok1 = await shareFile(tripsFile.name, tripsFile.content, tripsFile.mime, 'ייצוא נסיעות');
+    if (ok1) await shareFile(fuelFile.name, fuelFile.content, fuelFile.mime, 'ייצוא תדלוקים');
   }
 
   // ================= Actions =================
@@ -1135,7 +1136,7 @@
     const lc = MC.state.lastCalc;
     if (lc) Object.assign(ui.calc, { from: lc.from || null, to: lc.to || null, roundTrip: !!lc.roundTrip, passengers: MC.clamp(+lc.passengers || 1, 1, 8) });
     render();
-    if (!MC.state.onboarded) openSheet('welcome');
+    if (!MC.state.onboarded) openSheet(MC.firstSheet ? MC.firstSheet() : 'welcome');
     if (MC.isNative()) {
       MC.listen('App', 'backButton', onBack);
       MC.listen('App', 'appStateChange', (st) => { if (st && st.isActive) { backgroundSync(); flushOutbox(); autoUpdateCheck(); } });

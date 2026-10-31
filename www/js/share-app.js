@@ -73,10 +73,11 @@
     '<span class="grow"><span class="t">' + MC.esc(label) + '</span><span class="s">' + MC.esc(sub) + '</span></span>' + MC.icon('chevL', 'sm') + '</button>';
   MC.SHEETS.shareApp = {
     title: () => 'שיתוף האפליקציה',
-    render: () => '<p class="fine" style="font-size:14px;margin-top:0">אפשר לשלוח לחברים קישור לאתר של MyCar, עם הסבר והורדה, או את האפליקציה עצמה כקובץ.</p>' +
+    // The APK file is for Android phones; on iPhone and in a browser only the link (the site explains both).
+    render: () => '<p class="fine" style="font-size:14px;margin-top:0">אפשר לשלוח לחברים קישור לאתר של MyCar, עם הסבר והתקנה לאנדרואיד ולאייפון' + (MC.isNative() ? ', או את האפליקציה עצמה כקובץ' : '') + '.</p>' +
       '<div class="card tight">' +
       row('share-app-link', ICON_LINK, '', 'שליחת קישור לאתר', 'הודעה קצרה עם הקישור, לוואטסאפ ולכל מקום') +
-      row('share-app-apk', MC.icon('download'), 'green', 'שליחת האפליקציה כקובץ (APK)', 'בבלוטות\', בוואטסאפ או במנהל הקבצים. עובד גם בלי אינטרנט') +
+      (MC.isNative() ? row('share-app-apk', MC.icon('download'), 'green', 'שליחת האפליקציה כקובץ (APK)', 'בבלוטות\', בוואטסאפ או במנהל הקבצים. עובד גם בלי אינטרנט') : '') +
       row('share-app-copy', ICON_COPY, 'orange', 'העתקת הקישור לאתר', SITE.replace(/^https:\/\//, '').replace(/\/$/, '')) +
       '</div>' +
       '<div class="card tight"><p class="fine" style="margin:6px 0">ההודעה שנשלחת:<br>' + MC.esc(S.text) + '<br><span dir="ltr">' + MC.esc(SITE) + '</span></p></div>'
