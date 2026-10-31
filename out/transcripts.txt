@@ -1,13 +1,7 @@
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Traceback (most recent call last):
-  File "/home/runner/work/mycar/mycar/check.py", line 8, in <module>
-    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', path, '-ac', '1', '-ar', '16000', '-f', 'f32le', '-'],
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/subprocess.py", line 548, in run
-    with Popen(*popenargs, **kwargs) as process:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/subprocess.py", line 1026, in __init__
-    self._execute_child(args, executable, preexec_fn, close_fds,
-  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/subprocess.py", line 1955, in _execute_child
-    raise child_exception_type(errno_num, err_msg, err_filename)
-FileNotFoundError: [Errno 2] No such file or directory: 'ffmpeg'
+wav16/avri_l1.wav | כל טיפה. עולה לך כסף.
+wav16/avri_l2.wav | אז כמה באמת עולה לך כל נסיעה?
+wav16/avri_l3n.wav | מיקר מחשבת לך את זה. עד האגורה האחרונה.
+wav16/avri_l4.wav | כל נסיעה, כל תדלוק וכמה האוטו שלך באמת צורך.
+wav16/avri_l5n.wav | מה עיקר עד הטיפה האחרונה כל הסבר וההורדה בקישור.
+wav16/zz_final_track.wav | כל טיפה עולה לך כסף. אז כמה באמת עולה לך כל נסיעה? מעיקר מחשבת לך את זה עד האגורה האחרונה. כל נסיעה, כל תדלוק, וכמה האוטו שלך באמת צורך? מעיקר עד הטיפה האחרונה, כל הסבר וההורדה בקישור.
