@@ -14,7 +14,7 @@
   "footerNote": "הנתונים בצילומי המסך הם לדוגמה. מחירים ומרחקים באפליקציה הם הערכה.",
   "parts": [
     "hero", "WHATS_NEW", "offline", "install", "tabs",
-    "ch-calc", "ch-result", "ch-trips", "ch-fuel", "ch-stats", "ch-prefs", "ch-share",
+    "ch-calc", "ch-parking", "ch-result", "ch-trips", "ch-fuel", "ch-stats", "ch-prefs", "ch-share",
     "ch-updates", "ch-feedback", "kit:share-band", "kit:credit", "kit:footer"
   ]
 }

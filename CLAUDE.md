@@ -12,6 +12,7 @@
   - `www/js/web-app.js` (רישום העותק והחלפה לגרסה חדשה, `MC.isIOS`, `MC.deviceName`), `www/js/install-ios.js` (הסבר "הוספה למסך הבית" כשנפתח בספארי), `www/js/web-share.js` (גיבוי, אקסל ותמונה דרך תפריט השיתוף של האייפון).
   - מה שונה באייפון: אין התראות מתוזמנות (התזכורת מופיעה במסך החישוב), אין שליחת APK, העדכונים נכנסים לבד. כל יכולת חדשה שמשתמשת ב-plugin של Capacitor צריכה גם דרך שעובדת בדפדפן.
 - **שיתוף האפליקציה** (`www/js/share-app.js`, נטען אחרי `app.js`): קישור לאתר עם הודעה קצרה, או קובץ ה-APK המותקן (נמצא דרך `/proc/self/maps`, ואם לא, יורד מ-GitHub). בדיקה: `tests/share-app.test.mjs`.
+- **איפה הרכב?** (`www/js/parking.js` נתונים ו-GPS, `www/js/parking-ui.js` הכרטיס בראש מסך החישוב והחלונות `parkSave`/`parkFind`, `www/js/compass.js` מצפן, `www/parking.css`): נשמר רק בטלפון דרך `MC.kv` (`parking`, `parking-photo`), לא בתוך המצב הראשי ולא בגיבוי. מצלמה דרך `<input capture>` (בלי plugin, כדי שהעדכון ייכנס מתוך האפליקציה). בדיקה: `tests/parking.test.mjs`.
 - **מה חדש**: לפני כל גרסה כותבים את השינויים ב-`release-notes.txt` (שורה לכל שינוי, בשפה פשוטה). זה מוצג בחלון "גרסה חדשה" באפליקציה ובאתר.
 - מספר גרסה: `APP_VERSION` ב-`.github/workflows/build.yml` (ובברירות המחדל ב-`scripts/prepare-web.mjs`, `scripts/make-update.mjs`, `www/js/core.js`).
 - פניות מהאפליקציה נשלחות לסקריפט Google Apps Script של המפתח (`feedback/`: קובץ לכל חלק – `Settings`, `Main`, `Message`, `Email`, `Limits`, `Helpers`; אותו סקריפט משרת גם את שמרתי. הכתובת ב-`MC.FEEDBACK_URL`). כתובת המייל של המפתח לא נכנסת לקוד.

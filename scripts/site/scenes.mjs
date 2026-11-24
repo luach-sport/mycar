@@ -33,11 +33,31 @@ export async function prepare(page, { info }) {
 }
 export const reset = () => { window.__mycar.closeSheet(); window.scrollTo(0, 0); };
 
+// "Where did I park?": an example parking (floor -2, a note) with a drawn picture of a car-park pillar.
+const PARKED = `const m = window.__mycar, P = window.MC.parking;
+  window.MC.parkingUI.stopLive();
+  const c = document.createElement('canvas'); c.width = 960; c.height = 720; const g = c.getContext('2d');
+  const wall = g.createLinearGradient(0, 0, 0, 720); wall.addColorStop(0, '#a3a9b2'); wall.addColorStop(1, '#727983');
+  g.fillStyle = wall; g.fillRect(0, 0, 960, 720); g.fillStyle = '#4b5059'; g.fillRect(0, 520, 960, 200);
+  g.fillStyle = '#d3d6da'; g.fillRect(380, 0, 200, 560); g.fillStyle = '#f5c400'; g.fillRect(380, 170, 200, 190);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillStyle = '#1b1f27'; g.font = 'bold 120px Arial'; g.fillText('C4', 480, 268);
+  g.fillStyle = '#1652F0'; g.fillRect(700, 90, 180, 120); g.fillStyle = '#ffffff'; g.font = 'bold 76px Arial'; g.fillText('-2', 790, 152);
+  g.strokeStyle = '#f2f2f2'; g.lineWidth = 10; g.beginPath(); g.moveTo(80, 720); g.lineTo(230, 520); g.moveTo(880, 720); g.lineTo(730, 520); g.stroke();
+  P.spot = { id: 'demo', ts: Date.now() - 42 * 60e3, carId: 'c1', lat: 32.437, lon: 34.917, acc: 6, fixTs: Date.now() - 42 * 60e3, floor: '-2', note: 'עמוד C4, ליד המעליות', address: 'הרצל 10, חדרה', photo: true };
+  P.photo = c.toDataURL('image/jpeg', 0.82); P.capture = { state: 'found', done: true };
+  m.closeSheet(); m.ui.view = null; m.ui.tab = 'calc'; window.MC.render();`;
+
 const tab = (t) => "const m = window.__mycar; m.closeSheet(); m.ui.view = null; m.ui.tab = '" + t + "'; window.MC.render();";
 const scene = (name, body, extra) => Object.assign({ name, set: new Function('arg', body) }, extra || {});
 
 export const SCENES = [
   scene('calc', tab('calc')),
+  scene('park-save', PARKED + " m.openSheet('parkSave', {});", { wait: 700 }),
+  scene('park-find', PARKED + ` m.openSheet('parkFind', {});
+    const UI = window.MC.parkingUI; UI.stopLive();
+    UI.live.me = { lat: 32.437 - 0.00135, lon: 34.917 + 0.0002, acc: 5, heading: null, speed: 0, ts: Date.now() };
+    UI.live.fixedHeading = 352; UI.paint();`, { wait: 700 }),
   scene('result', `const m = window.__mycar, ui = m.ui;
     ui.result = { title: 'חדרה ← ירושלים', from: { name: 'חדרה', lat: 32.434, lon: 34.919 }, to: { name: 'ירושלים', lat: 31.778, lon: 35.2 }, route: { km: 109, urbanKm: 9, min: 84, source: 'online' }, roundTrip: true, passengers: 3, carId: 'c1', urbanPct: null, tag: 'private', savedId: null };
     ui.view = 'result'; window.MC.render();`),

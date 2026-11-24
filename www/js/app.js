@@ -612,6 +612,7 @@
       '<div class="card tight">' +
       '<div class="row"><span class="tile">' + icon('gauge') + '</span><span class="grow"><span class="t">מחשבון נסיעה</span><span class="s">ק״מ, ליטרים ועלות לפי הרכב, עירוני ובין-עירוני</span></span></div>' +
       '<div class="row"><span class="tile orange">' + icon('fuel') + '</span><span class="grow"><span class="t">יומן תדלוקים</span><span class="s">צריכה אמיתית, ק״מ לכל תדלוק ועלות לק״מ</span></span></div>' +
+      '<div class="row"><span class="tile">' + icon('pin') + '</span><span class="grow"><span class="t">איפה הרכב?</span><span class="s">שומרים את מקום החניה, וחץ מוביל אליו</span></span></div>' +
       '<div class="row"><span class="tile green">' + icon('offline') + '</span><span class="grow"><span class="t">עובד בלי אינטרנט</span><span class="s">הנתונים נשמרים רק בטלפון שלך</span></span></div></div>' +
       '<p class="fine">רשימת היישובים: הלשכה המרכזית לסטטיסטיקה. מסלולים וכתובות: OSRM ו-Nominatim, נתוני מפה © OpenStreetMap contributors. מחיר הדלק: מינהל הדלק והגז, משרד האנרגיה. המחירים והמרחקים הם הערכה, וייתכנו הבדלים מהמציאות.</p>' +
       updateBlock() +

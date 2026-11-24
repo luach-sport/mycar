@@ -17,7 +17,7 @@ await build({
 });
 console.log('cap-runtime.js built');
 
-const version = process.env.APP_VERSION || '1.05';
+const version = process.env.APP_VERSION || '1.06';
 const buildNo = process.env.GITHUB_RUN_NUMBER || 'dev';
 const info = { version, build: buildNo };
 

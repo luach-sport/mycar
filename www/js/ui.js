@@ -25,6 +25,7 @@
     let h = '';
     h += '<div class="top"><div class="titles"><span class="kicker">' + esc(MC.todayTitle()) + '</span><h1 class="h1">לאן נוסעים?</h1></div>' +
       '<button type="button" class="pill-btn" data-action="open-sheet" data-sheet="carPicker">' + icon('car') + '<span>' + esc(car.name) + '</span></button></div>';
+    if (MC.parkingCard) h += MC.parkingCard();
     h += MC.reminderNotices();
     if (MC.installNotice) h += MC.installNotice();
     if (!MC.online()) h += '<div class="notice gray">' + icon('offline', 'sm') + '<span class="grow">אין חיבור לאינטרנט. החישוב יתבסס על הנתונים שבמכשיר.</span></div>';
